@@ -1,11 +1,29 @@
-{% extends 'layout.html' %}
-{% block content %}
-<div class="container">
-    <div class="row">
-        <h1 class="display-1">Hello world!</h1>
-    </div>
-    <div class="row">
+{% extends "base.html" %}
 
+{% block title %}Developer Log{% endblock %}
+
+{% block nav %}
+<div class="container-fluid">
+    <a class="navbar-brand" href="#">DevLog</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="#" id="newEntryNav">New Entry</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" id="searchNav">Search</a>
+            </li>
+        </ul>
+        <div id="userInfo" class="navbar-text">
+        </div>
     </div>
 </div>
+{% endblock %}
+
+{% block content %}
+<div id="authSection" class="mb-4"></div>
+<div id="logEntries"></div>
 {% endblock %}

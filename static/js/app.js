@@ -1,3 +1,7 @@
+import { Auth } from './auth.js';
+import { LogEntry } from './logEntry.js';
+
+
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function () {
     navigator.serviceWorker
@@ -23,3 +27,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
+//AI >>
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const auth = new Auth();
+    const logEntry = new LogEntry();
+    
+    // Check authentication status
+    auth.checkAuthStatus();
+});
+// << AI
