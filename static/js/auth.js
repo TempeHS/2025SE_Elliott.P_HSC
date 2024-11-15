@@ -3,10 +3,13 @@ export class Auth {
         this.setupUI();
         this.bindEvents();
         this.checkAuthStatus();
+        this.csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     }
 
     setupUI() {
         const authSection = document.getElementById('authSection');
+        if (!authSection) return;
+
         authSection.innerHTML = `
             <div class="card">
                 <div class="card-body">
@@ -50,15 +53,22 @@ export class Auth {
     }
 
     bindEvents() {
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.login(e.target);
-        });
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
 
-        document.getElementById('signupForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.signup(e.target);
-        });
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await this.login(e.target);
+            });
+        }
+
+        if (signupForm) {
+            signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await this.signup(e.target);
+            });
+        }
     }
 
     async login(form) {
@@ -68,10 +78,11 @@ export class Auth {
         };
 
         try {
-            const response = await fetch('/api/login', {
+            const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': this.csrfToken
                 },
                 body: JSON.stringify(formData)
             });
@@ -79,7 +90,8 @@ export class Auth {
             const data = await response.json();
 
             if (response.ok) {
-                window.location.reload();
+                localStorage.setItem('userEmail', formData.email);
+                window.location.href = '/dashboard';
             } else {
                 const errorDiv = document.getElementById('loginError');
                 errorDiv.textContent = data.error || 'Login failed';
@@ -87,6 +99,9 @@ export class Auth {
             }
         } catch (error) {
             console.error('Login error:', error);
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.textContent = 'Network error occurred';
+            errorDiv.classList.remove('d-none');
         }
     }
 
@@ -97,10 +112,11 @@ export class Auth {
         };
 
         try {
-            const response = await fetch('/api/signup', {
+            const response = await fetch('/api/auth/signup', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': this.csrfToken
                 },
                 body: JSON.stringify(formData)
             });
@@ -108,7 +124,8 @@ export class Auth {
             const data = await response.json();
 
             if (response.ok) {
-                window.location.reload();
+                localStorage.setItem('userEmail', formData.email);
+                window.location.href = '/dashboard';
             } else {
                 const errorDiv = document.getElementById('signupError');
                 errorDiv.textContent = data.error || 'Signup failed';
@@ -116,34 +133,47 @@ export class Auth {
             }
         } catch (error) {
             console.error('Signup error:', error);
+            const errorDiv = document.getElementById('signupError');
+            errorDiv.textContent = 'Network error occurred';
+            errorDiv.classList.remove('d-none');
         }
     }
 
     async checkAuthStatus() {
         try {
-            const response = await fetch('/api/user');
-            if (response.ok) {
-                const data = await response.json();
-                document.getElementById('authSection').style.display = 'none';
-                const userInfo = document.getElementById('userInfo');
-                userInfo.innerHTML = `
-                    <span>${data.email}</span>
-                    <button class="btn btn-outline-light ms-2" onclick="logout()">Logout</button>
-                `;
+            const response = await fetch('/api/auth/user');
+            const data = await response.json();
+            
+            if (data.authenticated) {
+                this.updateUIForAuthenticatedUser(data);
             }
         } catch (error) {
             console.error('Auth check error:', error);
         }
     }
 
+    updateUIForAuthenticatedUser(data) {
+        const userInfo = document.getElementById('userInfo');
+        if (userInfo) {
+            userInfo.innerHTML = `
+                <span class="text-light">${data.email}</span>
+                <button class="btn btn-outline-light ms-2" onclick="logout()">Logout</button>
+            `;
+        }
+    }
+
     static async logout() {
         try {
-            const response = await fetch('/api/logout', {
-                method: 'POST'
+            const response = await fetch('/api/auth/logout', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content
+                }
             });
 
             if (response.ok) {
-                window.location.reload();
+                localStorage.removeItem('userEmail');
+                window.location.href = '/login';
             }
         } catch (error) {
             console.error('Logout error:', error);
@@ -151,5 +181,4 @@ export class Auth {
     }
 }
 
-// Add global logout function
 window.logout = Auth.logout;

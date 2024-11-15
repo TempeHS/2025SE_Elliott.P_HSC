@@ -29,3 +29,16 @@
     max-width: 800px;
     margin: 0 auto;
 }
+
+
+.auth-container {
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: 1rem;
+}
+
+.form-error {
+    color: #dc3545;
+    display: none;
+    margin-top: 0.5rem;
+}
