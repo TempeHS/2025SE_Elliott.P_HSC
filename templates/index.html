@@ -26,4 +26,9 @@
 {% block content %}
 <div id="authSection" class="mb-4"></div>
 <div id="logEntries"></div>
+
+<script type="module">
+    import { Auth } from '/static/js/auth.js';
+    new Auth();
+</script>
 {% endblock %}
