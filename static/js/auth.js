@@ -50,14 +50,17 @@ export class Auth {
     }
 
     bindEvents() {
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            this.login(e.target);
+            await this.login(e.target);
         });
 
-        document.getElementById('signupForm').addEventListener('submit', (e) => {
+        signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            this.signup(e.target);
+            await this.signup(e.target);
         });
     }
 
@@ -68,7 +71,7 @@ export class Auth {
         };
 
         try {
-            const response = await fetch('/api/login', {
+            const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -79,7 +82,8 @@ export class Auth {
             const data = await response.json();
 
             if (response.ok) {
-                window.location.reload();
+                localStorage.setItem('userEmail', formData.email);
+                window.location.href = '/dashboard';
             } else {
                 const errorDiv = document.getElementById('loginError');
                 errorDiv.textContent = data.error || 'Login failed';
@@ -97,7 +101,7 @@ export class Auth {
         };
 
         try {
-            const response = await fetch('/api/signup', {
+            const response = await fetch('/api/auth/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -108,7 +112,8 @@ export class Auth {
             const data = await response.json();
 
             if (response.ok) {
-                window.location.reload();
+                localStorage.setItem('userEmail', formData.email);
+                window.location.href = '/dashboard';
             } else {
                 const errorDiv = document.getElementById('signupError');
                 errorDiv.textContent = data.error || 'Signup failed';
@@ -121,7 +126,7 @@ export class Auth {
 
     async checkAuthStatus() {
         try {
-            const response = await fetch('/api/user');
+            const response = await fetch('/api/auth/user');
             if (response.ok) {
                 const data = await response.json();
                 document.getElementById('authSection').style.display = 'none';
@@ -138,12 +143,13 @@ export class Auth {
 
     static async logout() {
         try {
-            const response = await fetch('/api/logout', {
+            const response = await fetch('/api/auth/logout', {
                 method: 'POST'
             });
 
             if (response.ok) {
-                window.location.reload();
+                localStorage.removeItem('userEmail');
+                window.location.href = '/';
             }
         } catch (error) {
             console.error('Logout error:', error);
@@ -151,5 +157,4 @@ export class Auth {
     }
 }
 
-// Add global logout function
 window.logout = Auth.logout;
