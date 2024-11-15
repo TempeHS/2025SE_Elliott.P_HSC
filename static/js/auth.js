@@ -3,10 +3,13 @@ export class Auth {
         this.setupUI();
         this.bindEvents();
         this.checkAuthStatus();
+        this.csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     }
 
     setupUI() {
         const authSection = document.getElementById('authSection');
+        if (!authSection) return;
+
         authSection.innerHTML = `
             <div class="card">
                 <div class="card-body">
@@ -53,15 +56,19 @@ export class Auth {
         const loginForm = document.getElementById('loginForm');
         const signupForm = document.getElementById('signupForm');
 
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await this.login(e.target);
-        });
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await this.login(e.target);
+            });
+        }
 
-        signupForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await this.signup(e.target);
-        });
+        if (signupForm) {
+            signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await this.signup(e.target);
+            });
+        }
     }
 
     async login(form) {
@@ -74,7 +81,8 @@ export class Auth {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': this.csrfToken
                 },
                 body: JSON.stringify(formData)
             });
@@ -91,6 +99,9 @@ export class Auth {
             }
         } catch (error) {
             console.error('Login error:', error);
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.textContent = 'Network error occurred';
+            errorDiv.classList.remove('d-none');
         }
     }
 
@@ -104,7 +115,8 @@ export class Auth {
             const response = await fetch('/api/auth/signup', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': this.csrfToken
                 },
                 body: JSON.stringify(formData)
             });
@@ -121,35 +133,47 @@ export class Auth {
             }
         } catch (error) {
             console.error('Signup error:', error);
+            const errorDiv = document.getElementById('signupError');
+            errorDiv.textContent = 'Network error occurred';
+            errorDiv.classList.remove('d-none');
         }
     }
 
     async checkAuthStatus() {
         try {
             const response = await fetch('/api/auth/user');
-            if (response.ok) {
-                const data = await response.json();
-                document.getElementById('authSection').style.display = 'none';
-                const userInfo = document.getElementById('userInfo');
-                userInfo.innerHTML = `
-                    <span>${data.email}</span>
-                    <button class="btn btn-outline-light ms-2" onclick="logout()">Logout</button>
-                `;
+            const data = await response.json();
+            
+            if (data.authenticated) {
+                this.updateUIForAuthenticatedUser(data);
             }
         } catch (error) {
             console.error('Auth check error:', error);
         }
     }
 
+    updateUIForAuthenticatedUser(data) {
+        const userInfo = document.getElementById('userInfo');
+        if (userInfo) {
+            userInfo.innerHTML = `
+                <span class="text-light">${data.email}</span>
+                <button class="btn btn-outline-light ms-2" onclick="logout()">Logout</button>
+            `;
+        }
+    }
+
     static async logout() {
         try {
             const response = await fetch('/api/auth/logout', {
-                method: 'POST'
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content
+                }
             });
 
             if (response.ok) {
                 localStorage.removeItem('userEmail');
-                window.location.href = '/';
+                window.location.href = '/login';
             }
         } catch (error) {
             console.error('Logout error:', error);
