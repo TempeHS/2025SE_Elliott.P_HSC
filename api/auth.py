@@ -27,12 +27,12 @@ def signup():
     print(f"password : {'yes' if password else 'bo'}", file=sys.stdout)
 
     if not email or not password:
-        print("Validation failed: mssing email or password", file=sys.stdout)
+        print("validation failed: mssing email or password", file=sys.stdout)
         return jsonify({'error': 'email and password are required'}), 400
 
     # Check existing user
     existing_user = User.query.filter_by(email=email).first()
-    print(f"Existing user check: {'found' if existing_user else 'Not found'}", file=sys.stdout)
+    print(f"existing user check: {'found' if existing_user else 'not found'}", file=sys.stdout)
     
     if existing_user:
         return jsonify({'error': 'email already registered'}), 400
@@ -92,7 +92,7 @@ def login():
             'email': user.email
         })
 
-    print("Login failed: Invalid credentials", file=sys.stdout)
+    print("login failed: invalid credentials", file=sys.stdout)
     return jsonify({'error': 'invalid email or password'}), 401
 
 @api.route('/auth/user', methods=['GET'])
@@ -110,5 +110,5 @@ def get_current_user():
             })
         print("user in session but user not found in database", file=sys.stdout)
     
-    print("No user found", file=sys.stdout)
+    print("no user found (401(good))", file=sys.stdout)
     return jsonify({'authenticated': False}), 401
