@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div id="authSection">
+                <form id="signupForm" method="POST" action="{{ url_for('api.signup') }}">
+                    <h2>Sign Up</h2>
+                    <div class="mb-3">
+                        <label for="signupEmail" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="signupEmail" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="signupPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="signupPassword" name="password" required>
+                        <div class="form-text">Password must be at least 8 characters long and contain at least one number.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="developerTag" class="form-label">Developer Tag</label>
+                        <input type="text" class="form-control" id="developerTag" name="developer_tag" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Sign Up</button>
+                </form>
+                <p class="mt-3">Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
