@@ -6,6 +6,7 @@
             <div id="authSection">
                 <form id="signupForm" method="POST" action="{{ url_for('api.signup') }}">
                     <h2>Sign Up</h2>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                         <label for="signupEmail" class="form-label">Email address</label>
                         <input type="email" class="form-control" id="signupEmail" name="email" required>

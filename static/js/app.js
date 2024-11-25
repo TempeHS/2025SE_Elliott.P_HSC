@@ -1,12 +1,10 @@
-import { Auth } from './auth.js';
-import { LogEntry } from './logEntry.js';
-
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {
-        navigator.serviceWorker
-            .register("static/js/serviceWorker.js")
-            .then((res) => console.log("service worker registered"))
-            .catch((err) => console.log("service worker not registered", err));
+        navigator.serviceWorker.register("/service-worker.js").then(function (registration) {
+            console.log("ServiceWorker registration successful with scope: ", registration.scope);
+        }, function (err) {
+            console.log("ServiceWorker registration failed: ", err);
+        });
     });
 }
 
@@ -18,15 +16,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const linkUrl = link.getAttribute("href");
         if (linkUrl === currentUrl) {
             link.classList.add("active");
-            link.setAttribute("aria-current", "page");
         } else {
             link.classList.remove("active");
-            link.removeAttribute("aria-current");
         }
     });
 
-    const auth = new Auth();
-    const logEntry = new LogEntry();
-    
-    auth.checkAuthStatus();
+    // Initialize Auth class
+    new Auth();
 });

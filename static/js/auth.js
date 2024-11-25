@@ -1,111 +1,82 @@
 export class Auth {
     constructor() {
+        console.log('Auth class initialized');
         this.setupUI();
         this.bindEvents();
         this.csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     }
 
     setupUI() {
-        const authSection = document.getElementById('authSection');
-        if (!authSection) return;
+        this.loginForm = document.getElementById('loginForm');
+        this.signupForm = document.getElementById('signupForm');
     }
 
     bindEvents() {
-        const loginForm = document.getElementById('loginForm');
-        const signupForm = document.getElementById('signupForm');
-        const searchForm = document.getElementById('searchForm');
-
-        if (loginForm) {
-            loginForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                await this.login(new FormData(loginForm));
+        if (this.loginForm) {
+            this.loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(this.loginForm);
+                await this.login(formData);
             });
         }
 
-        if (signupForm) {
-            signupForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                await this.signup(new FormData(signupForm));
-            });
-        }
-
-        if (searchForm) {
-            searchForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                await this.searchEntries(new FormData(searchForm));
+        if (this.signupForm) {
+            this.signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(this.signupForm);
+                await this.signup(formData);
             });
         }
     }
 
-    async login(form) {
-        const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': this.csrfToken,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(Object.fromEntries(form))
-        });
-        const data = await response.json();
-        if (response.ok) {
-            window.location.href = '/';
-        } else {
-            console.error(data.error);
-        }
-    }
+    async login(formData) {
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': this.csrfToken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(Object.fromEntries(formData)),
+                credentials: 'same-origin'
+            });
 
-    async signup(form) {
-        const response = await fetch('/api/auth/signup', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': this.csrfToken,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(Object.fromEntries(form))
-        });
-        const data = await response.json();
-        if (response.ok) {
-            window.location.href = '/';
-        } else {
-            console.error(data.error);
-        }
-    }
-
-    async searchEntries(form) {
-        const params = new URLSearchParams(Object.fromEntries(form));
-        const response = await fetch(`/api/entries/search?${params.toString()}`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
+            const data = await response.json();
+            if (response.ok) {
+                window.location.href = data.redirect || '/';
+            } else {
+                alert(data.error || 'Login failed');
             }
-        });
-        const data = await response.json();
-        if (response.ok) {
-            this.displayResults(data);
-        } else {
-            console.error(data.error);
+        } catch (error) {
+            alert('Login failed. Please try again.');
         }
     }
 
-    displayResults(entries) {
-        const resultsDiv = document.getElementById('results');
-        resultsDiv.innerHTML = '';
-        entries.forEach(entry => {
-            const entryDiv = document.createElement('div');
-            entryDiv.className = 'entry';
-            entryDiv.innerHTML = `
-                <h3>${entry.project}</h3>
-                <p>${entry.date}</p>
-                <p>${entry.developer_tag}</p>
-            `;
-            resultsDiv.appendChild(entryDiv);
-        });
+    async signup(formData) {
+        try {
+            const response = await fetch('/api/auth/signup', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': this.csrfToken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(Object.fromEntries(formData)),
+                credentials: 'same-origin'
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                window.location.href = data.redirect || '/';
+            } else {
+                alert(data.error || 'Signup failed');
+            }
+        } catch (error) {
+            alert('Signup failed. Please try again.');
+        }
     }
 }
 
+// Initialize auth when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     new Auth();
 });
