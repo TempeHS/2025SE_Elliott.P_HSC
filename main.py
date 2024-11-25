@@ -1,22 +1,12 @@
+import os
 from flask import Flask, render_template, request, session, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
-from flask_login import LoginManager
-from models import db, User
+from models import db
 from api import api
-import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
-
-# Initialize CSRF protection
-csrf = CSRFProtect(app)
-csrf.init_app(app)
-
-# Initialize LoginManager
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
 
 # Database setup
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -25,6 +15,8 @@ db_path = os.path.join(basedir, '.databaseFiles', 'devlog.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Security setup
+csrf = CSRFProtect(app)
 db.init_app(app)
 app.register_blueprint(api, url_prefix='/api')
 
@@ -33,31 +25,38 @@ def check_auth():
 
 @app.route('/')
 def index():
+    print("index accessed")
     if not check_auth():
-        return redirect(url_for('login'))
+        print("auth needed -> login")
+        return redirect('/login')
+    print("serving index")
     return render_template('index.html')
 
 @app.route('/login')
 def login():
+    print("login accessed")
     if check_auth():
-        return redirect(url_for('index'))
+        print("already auth -> index")
+        return redirect('/')
+    print("serving login")
     return render_template('login.html')
 
 @app.route('/signup')
 def signup():
+    print("signup accessed")
     if check_auth():
-        return redirect(url_for('index'))
+        print("already auth -> index")
+        return redirect('/')
+    print("serving signup")
     return render_template('signup.html')
 
 @app.before_request
 def log_request():
-    print(f"Request: {request.method} {request.path}")
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+    print(f"req: {request.method} {request.url} from {request.remote_addr}")
 
 if __name__ == '__main__':
     with app.app_context():
+        print("init db...")
         db.create_all()
+        print("db ready")
     app.run(debug=True)

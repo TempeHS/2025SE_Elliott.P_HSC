@@ -1,7 +1,7 @@
 const CACHE_NAME = 'devlog-v1';
 const URLS_TO_CACHE = [
     '/',
-    '/static/css/style.css',
+    '/static/css/styles.css',
     '/static/js/app.js',
     '/static/js/auth.js',
     '/static/js/logEntry.js'

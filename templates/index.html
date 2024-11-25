@@ -26,20 +26,8 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <h2>Create a New Diary Entry</h2>
-            <form id="entryForm">
-                <div class="mb-3">
-                    <label for="project" class="form-label">Project</label>
-                    <input type="text" class="form-control" id="project" name="project" required>
-                </div>
-                <div class="mb-3">
-                    <label for="content" class="form-label">Content</label>
-                    <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Create Entry</button>
-            </form>
-            <div id="searchSection" class="mt-5">
+        <div class="col-md-6">
+            <div id="searchSection">
                 <form id="searchForm" method="GET">
                     <h2>Search Entries</h2>
                     <div class="mb-3">

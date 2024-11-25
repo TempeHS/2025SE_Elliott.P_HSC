@@ -1,55 +1,98 @@
 from flask import jsonify, request, session
-from flask_login import login_user, logout_user
-from models import User, db
+from werkzeug.security import generate_password_hash, check_password_hash
+from models import db, User
 from . import api
-from .user_manager import UserManagement
-
-@api.route('/auth/login', methods=['POST'])
-def login():
-    try:
-        data = request.get_json()
-        if not data or 'email' not in data or 'password' not in data:
-            return jsonify({'error': 'Missing credentials'}), 400
-            
-        user = UserManagement.authenticate(data['email'], data['password'])
-        
-        if user:
-            UserManagement.login_user(user)
-            session['user_id'] = user.id  # Assign user ID to session
-            return jsonify({'message': 'Login successful', 'redirect': '/'})
-        return jsonify({'error': 'Invalid credentials'}), 401
-    except Exception as e:
-        return jsonify({'error': str(e)}), 400
+import re
+import sys
 
 @api.route('/auth/signup', methods=['POST'])
 def signup():
+    print("request received at /api/auth/signup", file=sys.stdout)
+    print(f"request headers: {dict(request.headers)}", file=sys.stdout)
+    print(f"request method: {request.method}", file=sys.stdout)
+    
     try:
         data = request.get_json()
-        if not all(k in data for k in ['email', 'password', 'developer_tag']):
-            return jsonify({'error': 'Missing required fields'}), 400
-            
-        user = UserManagement.create_user(
-            email=data['email'],
-            password=data['password'],
-            developer_tag=data['developer_tag']
+        print(f"received data: {data}", file=sys.stdout)
+    except Exception as e:
+        print(f"error parsing JSON: {e}", file=sys.stdout)
+        return jsonify({'error': 'invalid JSON data'}), 400
+
+    email = data.get('email')
+    password = data.get('password')
+    developer_tag = data.get('developer_tag')
+
+    if not email or not password or not developer_tag:
+        print("validation failed: missing email, password, or developer tag", file=sys.stdout)
+        return jsonify({'error': 'email, password, and developer tag are required'}), 400
+
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        print("validation failed: invalid email format", file=sys.stdout)
+        return jsonify({'error': 'invalid email format'}), 400
+
+    if len(password) < 8 or not re.search(r"\d", password):
+        print("validation failed: password requirements not met", file=sys.stdout)
+        return jsonify({'error': 'password must be at least 8 characters long and contain at least one number'}), 400
+
+    existing_user = User.query.filter_by(email=email).first()
+    if existing_user:
+        print("validation failed: email already registered", file=sys.stdout)
+        return jsonify({'error': 'email already registered'}), 400
+
+    existing_tag = User.query.filter_by(developer_tag=developer_tag).first()
+    if existing_tag:
+        print("validation failed: developer tag already registered", file=sys.stdout)
+        return jsonify({'error': 'developer tag already registered'}), 400
+
+    try:
+        new_user = User(
+            email=email,
+            password_hash=generate_password_hash(password),
+            developer_tag=developer_tag
         )
-        
-        db.session.add(user)
+        db.session.add(new_user)
         db.session.commit()
-        
-        UserManagement.login_user(user)
-        session['user_id'] = user.id  # Assign user ID to session
-        return jsonify({'message': 'Registration successful', 'redirect': '/'})
-        
+        session['user_id'] = new_user.id
+        print(f"user created: {email}", file=sys.stdout)
+        return jsonify({'message': 'registration successful', 'email': email})
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 400
+        print(f"database error occurred: {str(e)}", file=sys.stdout)
+        return jsonify({'error': 'failed to create user'}), 500
 
-@api.route('/auth/logout', methods=['POST'])
-def logout():
+@api.route('/auth/login', methods=['POST'])
+def login():
+    print("request received at /api/auth/login", file=sys.stdout)
+    print(f"request headers: {dict(request.headers)}", file=sys.stdout)
+    print(f"request method: {request.method}", file=sys.stdout)
+
     try:
-        UserManagement.logout_user()
-        session.clear()
-        return jsonify({'message': 'Logged out successfully', 'redirect': '/login'})
+        data = request.get_json()
+        print(f"received login attempt for email: {data.get('email')}", file=sys.stdout)
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        print(f"error parsing JSON: {e}", file=sys.stdout)
+        return jsonify({'error': 'invalid JSON data'}), 400
+
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        print("login failed: missing credentials", file=sys.stdout)
+        return jsonify({'error': 'email and password are required'}), 400
+
+    user = User.query.filter_by(email=email).first()
+    if user and check_password_hash(user.password_hash, password):
+        session['user_id'] = user.id
+        print(f"login successful for: {email}", file=sys.stdout)
+        return jsonify({'message': 'login successful', 'email': user.email})
+
+    print("login failed: invalid credentials", file=sys.stdout)
+    return jsonify({'error': 'invalid email or password'}), 401
+
+@api.route('/auth/user', methods=['GET'])
+def get_current_user():
+    if 'user_id' in session:
+        user = User.query.get(session['user_id'])
+        if user:
+            return jsonify({'email': user.email})
+    return jsonify({'error': 'unauthorized'}), 401
