@@ -26,27 +26,19 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div id="entrySection">
-                <form id="entryForm" method="POST" action="{{ url_for('api.create_entry') }}">
-                    <h2>New Entry</h2>
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <div class="mb-3">
-                        <label for="projectSelect" class="form-label">Project</label>
-                        <select class="form-control" id="projectSelect" name="project">
-                            <option value="">Select a project</option>
-                            <!-- Add options dynamically from the database -->
-                        </select>
-                        <div class="form-text">Or create a new project</div>
-                        <input type="text" class="form-control mt-2" id="newProject" name="new_project" placeholder="New project name">
-                    </div>
-                    <div class="mb-3">
-                        <label for="content" class="form-label">Content</label>
-                        <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
-            </div>
+        <div class="col-md-8">
+            <h2>Create a New Diary Entry</h2>
+            <form id="entryForm">
+                <div class="mb-3">
+                    <label for="project" class="form-label">Project</label>
+                    <input type="text" class="form-control" id="project" name="project" required>
+                </div>
+                <div class="mb-3">
+                    <label for="content" class="form-label">Content</label>
+                    <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Create Entry</button>
+            </form>
             <div id="searchSection" class="mt-5">
                 <form id="searchForm" method="GET">
                     <h2>Search Entries</h2>

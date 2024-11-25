@@ -1,5 +1,5 @@
 from flask import jsonify, request, session
-from models import LogEntry, db
+from models import LogEntry, db, User
 from . import api
 
 @api.route('/entries', methods=['POST'])
