@@ -35,4 +35,3 @@ def create_entry():
         print(f"entry error: {str(e)}")
         db.session.rollback()
         return jsonify({'error': 'Failed to create entry'}), 500
-

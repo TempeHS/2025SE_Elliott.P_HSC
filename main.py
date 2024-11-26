@@ -50,6 +50,15 @@ def signup():
     print("serving signup")
     return render_template('signup.html')
 
+@app.route('/dashboard')
+def dashboard():
+    print("dashboard accessed")
+    if not check_auth():
+        print("auth needed -> login")
+        return redirect('/login')
+    print("serving dashboard")
+    return render_template('index.html')
+
 @app.before_request
 def log_request():
     print(f"req: {request.method} {request.url} from {request.remote_addr}")

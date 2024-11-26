@@ -24,39 +24,11 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div id="searchSection">
-                <form id="searchForm" method="GET">
-                    <h2>Search Entries</h2>
-                    <div class="mb-3">
-                        <label for="developerTag" class="form-label">Developer Tag</label>
-                        <input type="text" class="form-control" id="developerTag" name="developer_tag">
-                    </div>
-                    <div class="mb-3">
-                        <label for="project" class="form-label">Project</label>
-                        <input type="text" class="form-control" id="project" name="project">
-                    </div>
-                    <div class="mb-3">
-                        <label for="sortBy" class="form-label">Sort By</label>
-                        <select class="form-control" id="sortBy" name="sort_by">
-                            <option value="date">Date</option>
-                            <option value="project">Project</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="order" class="form-label">Order</label>
-                        <select class="form-control" id="order" name="order">
-                            <option value="asc">Ascending</option>
-                            <option value="desc">Descending</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Search</button>
-                </form>
-                <div id="results"></div>
-            </div>
-        </div>
-    </div>
-</div>
+<div id="authSection" class="mb-4"></div>
+<div id="logEntries"></div>
+
+<script type="module">
+    import { Auth } from '/static/js/auth.js';
+    new Auth();
+</script>
 {% endblock %}

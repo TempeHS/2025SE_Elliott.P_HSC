@@ -2,110 +2,183 @@ export class Auth {
     constructor() {
         this.setupUI();
         this.bindEvents();
+        this.checkAuthStatus();
         this.csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     }
 
     setupUI() {
         const authSection = document.getElementById('authSection');
         if (!authSection) return;
+
+        authSection.innerHTML = `
+            <div class="card">
+                <div class="card-body">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#login">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#signup">Sign Up</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content mt-3">
+                        <div class="tab-pane fade show active" id="login">
+                            <form id="loginForm">
+                                <div class="mb-3">
+                                    <input type="email" class="form-control" name="email" placeholder="Email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="password" class="form-control" name="password" placeholder="Password" required>
+                                </div>
+                                <div id="loginError" class="alert alert-danger d-none"></div>
+                                <button type="submit" class="btn btn-primary">Login</button>
+                            </form>
+                        </div>
+                        <div class="tab-pane fade" id="signup">
+                            <form id="signupForm">
+                                <div class="mb-3">
+                                    <input type="email" class="form-control" name="email" placeholder="Email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="password" class="form-control" name="password" placeholder="Password" required>
+                                </div>
+                                <div id="signupError" class="alert alert-danger d-none"></div>
+                                <button type="submit" class="btn btn-primary">Sign Up</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
     bindEvents() {
         const loginForm = document.getElementById('loginForm');
         const signupForm = document.getElementById('signupForm');
-        const searchForm = document.getElementById('searchForm');
 
         if (loginForm) {
-            loginForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                await this.login(new FormData(loginForm));
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await this.login(e.target);
             });
         }
 
         if (signupForm) {
-            signupForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                await this.signup(new FormData(signupForm));
-            });
-        }
-
-        if (searchForm) {
-            searchForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                await this.searchEntries(new FormData(searchForm));
+            signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await this.signup(e.target);
             });
         }
     }
 
     async login(form) {
-        const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': this.csrfToken,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(Object.fromEntries(form))
-        });
-        const data = await response.json();
-        if (response.ok) {
-            window.location.href = '/';
-        } else {
-            console.error(data.error);
+        const formData = {
+            email: form.querySelector('input[name="email"]').value,
+            password: form.querySelector('input[name="password"]').value
+        };
+
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': this.csrfToken
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                localStorage.setItem('userEmail', formData.email);
+                window.location.href = '/dashboard';
+            } else {
+                const errorDiv = document.getElementById('loginError');
+                errorDiv.textContent = data.error || 'Login failed';
+                errorDiv.classList.remove('d-none');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.textContent = 'Network error occurred';
+            errorDiv.classList.remove('d-none');
         }
     }
 
     async signup(form) {
-        const response = await fetch('/api/auth/signup', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': this.csrfToken,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(Object.fromEntries(form))
-        });
-        const data = await response.json();
-        if (response.ok) {
-            window.location.href = '/';
-        } else {
-            console.error(data.error);
-        }
-    }
+        const formData = {
+            email: form.querySelector('input[name="email"]').value,
+            password: form.querySelector('input[name="password"]').value
+        };
 
-    async searchEntries(form) {
-        const params = new URLSearchParams(Object.fromEntries(form));
-        const response = await fetch(`/api/entries/search?${params.toString()}`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
+        try {
+            const response = await fetch('/api/auth/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': this.csrfToken
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                localStorage.setItem('userEmail', formData.email);
+                window.location.href = '/dashboard';
+            } else {
+                const errorDiv = document.getElementById('signupError');
+                errorDiv.textContent = data.error || 'Signup failed';
+                errorDiv.classList.remove('d-none');
             }
-        });
-        const data = await response.json();
-        if (response.ok) {
-            this.displayResults(data);
-        } else {
-            console.error(data.error);
+        } catch (error) {
+            console.error('Signup error:', error);
+            const errorDiv = document.getElementById('signupError');
+            errorDiv.textContent = 'Network error occurred';
+            errorDiv.classList.remove('d-none');
         }
     }
 
-    displayResults(entries) {
-        const resultsDiv = document.getElementById('results');
-        resultsDiv.innerHTML = '';
-        entries.forEach(entry => {
-            const entryDiv = document.createElement('div');
-            entryDiv.className = 'entry';
-            entryDiv.innerHTML = `
-                <h3>${entry.project}</h3>
-                <p>${entry.date}</p>
-                <p>${entry.developer_tag}</p>
+    async checkAuthStatus() {
+        try {
+            const response = await fetch('/api/auth/user');
+            const data = await response.json();
+            
+            if (data.authenticated) {
+                this.updateUIForAuthenticatedUser(data);
+            }
+        } catch (error) {
+            console.error('Auth check error:', error);
+        }
+    }
+
+    updateUIForAuthenticatedUser(data) {
+        const userInfo = document.getElementById('userInfo');
+        if (userInfo) {
+            userInfo.innerHTML = `
+                <span class="text-light">${data.email}</span>
+                <button class="btn btn-outline-light ms-2" onclick="logout()">Logout</button>
             `;
-            resultsDiv.appendChild(entryDiv);
-        });
+        }
+    }
+
+    static async logout() {
+        try {
+            const response = await fetch('/api/auth/logout', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+
+            if (response.ok) {
+                localStorage.removeItem('userEmail');
+                window.location.href = '/login';
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    new Auth();
-});
+window.logout = Auth.logout;
