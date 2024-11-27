@@ -76,6 +76,9 @@ export class Auth {
 
             if (response.ok) {
                 window.location.reload();
+            } else {
+                const result = await response.json();
+                console.error('Login failed:', result.error);
             }
         } catch (error) {
             console.error('Login error:', error);
@@ -100,6 +103,9 @@ export class Auth {
 
             if (response.ok) {
                 window.location.reload();
+            } else {
+                const result = await response.json();
+                console.error('Signup failed:', result.error);
             }
         } catch (error) {
             console.error('Signup error:', error);

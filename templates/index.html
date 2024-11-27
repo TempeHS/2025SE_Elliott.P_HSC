@@ -14,7 +14,7 @@
                 <a class="nav-link" href="#" id="newEntryNav">New Entry</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#" id="searchNav">Search</a>
+                <a class="nav-link" href="/search">Search</a>
             </li>
         </ul>
         <div id="userInfo" class="navbar-text">
@@ -25,5 +25,107 @@
 
 {% block content %}
 <div id="authSection" class="mb-4"></div>
-<div id="logEntries"></div>
+<div id="logEntries">
+    <div class="card">
+        <div class="card-body">
+            <form id="entryForm">
+                <div class="mb-3">
+                    <label for="projectSelect" class="form-label">Project</label>
+                    <select class="form-select" id="projectSelect" required>
+                        <option value="" disabled selected>Select a project</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <textarea class="form-control" placeholder="Content" required></textarea>
+                </div>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-primary">Create Entry</button>
+            </form>
+        </div>
+    </div>
+    <div class="card mt-4">
+        <div class="card-body">
+            <form id="projectForm">
+                <div class="mb-3">
+                    <label for="newProject" class="form-label">New Project</label>
+                    <input type="text" class="form-control" id="newProject" placeholder="Project Name" required>
+                </div>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-primary">Create Project</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', async function () {
+    const projectSelect = document.getElementById('projectSelect');
+    const response = await fetch('/api/projects');
+    const projects = await response.json();
+    projects.forEach(project => {
+        const option = document.createElement('option');
+        option.value = project;
+        option.textContent = project;
+        projectSelect.appendChild(option);
+    });
+
+    document.getElementById('entryForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const csrfToken = e.target.querySelector('input[name="csrf_token"]').value;
+        const data = {
+            project: e.target.querySelector('#projectSelect').value,
+            content: e.target.querySelector('textarea').value
+        };
+        console.log('entry data:', data);
+        try {
+            const response = await fetch('/api/entries', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            if (response.ok) {
+                console.log('entry created:', result);
+                // Optionally, you can update the UI to show the new entry
+            } else {
+                console.error('entry creation failed:', result.error);
+            }
+        } catch (error) {
+            console.error('entry creation error:', error);
+        }
+    });
+
+    document.getElementById('projectForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const csrfToken = e.target.querySelector('input[name="csrf_token"]').value;
+        const newProject = e.target.querySelector('#newProject').value;
+        console.log('new project:', newProject);
+        try {
+            const response = await fetch('/api/projects', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ project: newProject })
+            });
+            const result = await response.json();
+            if (response.ok) {
+                console.log('project created:', result);
+                const option = document.createElement('option');
+                option.value = newProject;
+                option.textContent = newProject;
+                projectSelect.appendChild(option);
+                e.target.reset();
+            } else {
+                console.error('project creation failed:', result.error);
+            }
+        } catch (error) {
+            console.error('project creation error:', error);
+        }
+    });
+});
+</script>
 {% endblock %}

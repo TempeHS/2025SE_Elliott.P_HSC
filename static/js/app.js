@@ -1,41 +1,41 @@
 import { Auth } from './auth.js';
 import { LogEntry } from './logEntry.js';
 
-
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function () {
     navigator.serviceWorker
-      .register("static/js/serviceWorker.js")
-      .then((res) => console.log("service worker registered"))
-      .catch((err) => console.log("service worker not registered", err));
+      .register("/static/js/serviceWorker.js")
+      .then((res) => console.log("Service worker registered"))
+      .catch((err) => console.log("Service worker not registered", err));
   });
 }
 
-// This script toggles the active class and aria-current attribute on the nav links
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
+  const response = await fetch('/api/user');
+  if (!response.ok) {
+    window.location.href = '/login';
+    return;
+  }
+
+  const auth = new Auth();
+  auth.checkAuthStatus();
+
+  const logEntry = new LogEntry();
+
   const navLinks = document.querySelectorAll(".nav-link");
   const currentUrl = window.location.pathname;
 
   navLinks.forEach((link) => {
-    const linkUrl = link.getAttribute("href");
-    if (linkUrl === currentUrl) {
+    if (link.getAttribute("href") === currentUrl) {
       link.classList.add("active");
-      link.setAttribute("aria-current", "page");
-    } else {
-      link.classList.remove("active");
-      link.removeAttribute("aria-current");
     }
   });
+
+  document.getElementById('newEntryNav').addEventListener('click', () => {
+    logEntry.setupUI();
+  });
+
+  document.getElementById('searchNav').addEventListener('click', () => {
+    logEntry.setupSearchUI();
+  });
 });
-
-//AI >>
-
-
-document.addEventListener('DOMContentLoaded', () => {
-    const auth = new Auth();
-    const logEntry = new LogEntry();
-    
-    // Check authentication status
-    auth.checkAuthStatus();
-});
-// << AI

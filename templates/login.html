@@ -1,0 +1,51 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <h1 class="display-1">Login</h1>
+    </div>
+    <div class="row">
+        <form id="loginForm">
+            <div class="mb-3">
+                <input type="email" class="form-control" placeholder="Email" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" class="form-control" placeholder="Password" required>
+            </div>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+        <p>Don't have an account? <a href="/signup">Sign up here</a></p>
+    </div>
+</div>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const csrfToken = e.target.querySelector('input[name="csrf_token"]').value;
+    const data = {
+        email: e.target.querySelector('input[type="email"]').value,
+        password: e.target.querySelector('input[type="password"]').value
+    };
+    console.log('login data:', data);
+    try {
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        if (response.ok) {
+            console.log('login successful:', result.message);
+            window.location.href = result.redirect;
+        } else {
+            console.error('login failed:', result.error);
+        }
+    } catch (error) {
+        console.error('login error:', error);
+    }
+});
+</script>
+{% endblock %}

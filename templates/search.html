@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Search Entries{% endblock %}
+
+{% block nav %}
+<div class="container-fluid">
+    <a class="navbar-brand" href="#">DevLog</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/search">Search</a>
+            </li>
+        </ul>
+        <div id="userInfo" class="navbar-text">
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <h1 class="display-1">Search Entries</h1>
+    </div>
+    <div class="row">
+        <form id="searchForm">
+            <div class="mb-3">
+                <input type="text" class="form-control" placeholder="Search by project, content, or developer" required>
+            </div>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
+    <div class="row mt-4" id="searchResults"></div>
+</div>
+<script>
+document.getElementById('searchForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const csrfToken = e.target.querySelector('input[name="csrf_token"]').value;
+    const query = e.target.querySelector('input[type="text"]').value;
+    console.log('search query:', query);
+    try {
+        const response = await fetch(`/api/entries/search?query=${query}`, {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
+        });
+        const results = await response.json();
+        const searchResultsDiv = document.getElementById('searchResults');
+        searchResultsDiv.innerHTML = '';
+        if (response.ok) {
+            results.forEach(entry => {
+                const entryDiv = document.createElement('div');
+                entryDiv.className = 'card mb-3';
+                entryDiv.innerHTML = `
+                    <div class="card-body">
+                        <h5 class="card-title">${entry.project}</h5>
+                        <p class="card-text">${entry.content}</p>
+                        <p class="card-text"><small class="text-muted">Created by ${entry.developer} on ${entry.timestamp}</small></p>
+                    </div>
+                `;
+                searchResultsDiv.appendChild(entryDiv);
+            });
+        } else {
+            console.error('search failed:', results.error);
+        }
+    } catch (error) {
+        console.error('search error:', error);
+    }
+});
+</script>
+{% endblock %}
