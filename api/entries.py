@@ -61,16 +61,34 @@ def create_project():
 
 @entries_bp.route('/api/entries/search', methods=['GET'])
 def search_entries():
-    query = request.args.get('query')
-    logger.debug('search entries query: %s', query)
-    if not query:
-        return jsonify({'error': 'Query parameter is required'}), 400
+    project = request.args.get('project')
+    date = request.args.get('date')
+    content = request.args.get('content')
+    filter_by = request.args.get('filter')
+    sort_order = request.args.get('sort', 'asc')
 
-    entries = LogEntry.query.filter(
-        (LogEntry.project.contains(query)) |
-        (LogEntry.content.contains(query)) |
-        (LogEntry.developer.has(email=query))
-    ).all()
+    logger.debug('search entries query: project=%s, date=%s, content=%s, filter=%s, sort=%s', project, date, content, filter_by, sort_order)
+
+    query = LogEntry.query
+
+    if project:
+        query = query.filter(LogEntry.project == project)
+    if date:
+        query = query.filter(db.func.date(LogEntry.timestamp) == date)
+    if content:
+        query = query.filter(LogEntry.content.contains(content))
+
+    if filter_by == 'project':
+        query = query.order_by(LogEntry.project)
+    elif filter_by == 'content':
+        query = query.order_by(LogEntry.content)
+
+    if sort_order == 'asc':
+        query = query.order_by(LogEntry.timestamp.asc())
+    else:
+        query = query.order_by(LogEntry.timestamp.desc())
+
+    entries = query.all()
 
     results = [{
         'id': entry.id,
@@ -99,3 +117,5 @@ def delete_entry(entry_id):
     db.session.commit()
     logger.debug('entry deleted: %s', entry)
     return jsonify({'message': 'Entry deleted'})
+#does the method names
+#also handles input snaitization and validation forwarding to the data_management.py file

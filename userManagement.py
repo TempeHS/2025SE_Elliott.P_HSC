@@ -10,3 +10,4 @@ def getUsers():
     con.close()
     return cur
 
+#im not using this file technically

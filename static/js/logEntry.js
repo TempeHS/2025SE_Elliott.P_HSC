@@ -132,3 +132,5 @@ export class LogEntry {
         `).join('');
     }
 }
+
+// this basically handles the log entry functionality from the frontend to the backend python

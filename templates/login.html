@@ -15,6 +15,7 @@
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn btn-primary">Login</button>
         </form>
+        <div id="loginError" class="alert alert-danger mt-3" style="display: none;"></div>
         <p>Don't have an account? <a href="/signup">Sign up here</a></p>
     </div>
 </div>
@@ -41,7 +42,10 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             console.log('login successful:', result.message);
             window.location.href = result.redirect;
         } else {
-            console.error('login failed:', result.error);
+            const errorBox = document.getElementById('loginError');
+            errorBox.style.display = 'block';
+            errorBox.textContent = result.errors ? result.errors.join(', ') : result.error;
+            console.error('login failed:', result.errors || result.error);
         }
     } catch (error) {
         console.error('login error:', error);

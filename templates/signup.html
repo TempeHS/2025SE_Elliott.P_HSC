@@ -11,10 +11,14 @@
             </div>
             <div class="mb-3">
                 <input type="password" class="form-control" placeholder="Password" required>
+                <small class="form-text text-muted">
+                    Password must be at least 9 characters long, contain an uppercase letter, a number, and a special character.
+                </small>
             </div>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn btn-primary">Sign Up</button>
         </form>
+        <div id="signupError" class="alert alert-danger mt-3" style="display: none;"></div>
     </div>
 </div>
 <script>
@@ -40,7 +44,10 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
             console.log('signup successful:', result.message);
             window.location.href = result.redirect;
         } else {
-            console.error('signup failed:', result.error);
+            const errorBox = document.getElementById('signupError');
+            errorBox.style.display = 'block';
+            errorBox.textContent = result.errors ? result.errors.join(', ') : result.error;
+            console.error('signup failed:', result.errors || result.error);
         }
     } catch (error) {
         console.error('signup error:', error);

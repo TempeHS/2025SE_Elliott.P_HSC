@@ -39,3 +39,5 @@ document.addEventListener("DOMContentLoaded", async function () {
     logEntry.setupSearchUI();
   });
 });
+
+// this basically checks if the service worker is supported by the browser

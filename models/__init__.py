@@ -15,3 +15,5 @@ class LogEntry(db.Model):
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     developer_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+#sets up the database and database entry stuff, with limitations on entry length and required fields

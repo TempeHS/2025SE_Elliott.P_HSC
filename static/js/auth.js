@@ -129,3 +129,5 @@ export class Auth {
         }
     }
 }
+
+// this basically just sets up the UI for the auth section and binds the events for the login and signup forms.

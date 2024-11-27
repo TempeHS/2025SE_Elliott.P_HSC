@@ -27,7 +27,7 @@ def signup():
 
     if User.query.filter_by(email=data['email']).first():
         logger.debug('signup error: email already registered')
-        return jsonify({'error': 'email already registered'}), 400
+        return jsonify({'error': 'Email already registered'}), 400
 
     user = User(
         email=data['email'],
@@ -38,7 +38,7 @@ def signup():
 
     session['user_id'] = user.id
     logger.debug('signup successful for user: %s', user.email)
-    return jsonify({'message': 'registration successful', 'redirect': url_for('index')})
+    return jsonify({'message': 'Registration successful', 'redirect': url_for('index')})
 
 @auth_bp.route('/api/login', methods=['POST'])
 def login():
@@ -54,16 +54,16 @@ def login():
     if user and check_password_hash(user.password_hash, data['password']):
         session['user_id'] = user.id
         logger.debug('login successful for user: %s', user.email)
-        return jsonify({'message': 'login successful', 'redirect': url_for('index')})
+        return jsonify({'message': 'Login successful', 'redirect': url_for('index')})
 
     logger.debug('login error: invalid credentials')
-    return jsonify({'error': 'invalid credentials'}), 401
+    return jsonify({'error': 'Invalid credentials'}), 401
 
 @auth_bp.route('/api/logout', methods=['POST'])
 def logout():
     session.pop('user_id', None)
     logger.debug('logout successful')
-    return jsonify({'message': 'logout successful'})
+    return jsonify({'message': 'Logout successful'})
 
 @auth_bp.route('/api/user')
 def get_user():
@@ -72,4 +72,7 @@ def get_user():
         logger.debug('get user: %s', user.email)
         return jsonify({'email': user.email})
     logger.debug('get user error: not authenticated')
-    return jsonify({'error': 'not authenticated'}), 401
+    return jsonify({'error': 'Not authenticated'}), 401
+
+#handles session management!
+#and user authenications
