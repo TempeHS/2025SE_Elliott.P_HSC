@@ -4,6 +4,7 @@ from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager
 from models import db, User
 from api import api
+from config import Config
 import os
 
 app = Flask(__name__)
@@ -28,6 +29,15 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 app.register_blueprint(api, url_prefix='/api')
 
+@app.after_request
+def add_security_headers(response):
+    for key, value in Config.CSP.items():
+        response.headers[f'Content-Security-Policy'] = '; '.join(f"{k} {v}" for k, v in Config.CSP.items())
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    return response
+
 def check_auth():
     return 'user_id' in session
 
@@ -37,11 +47,19 @@ def index():
         return redirect(url_for('login'))
     return render_template('index.html')
 
+
+
 @app.route('/login')
 def login():
     if check_auth():
         return redirect(url_for('index'))
     return render_template('login.html')
+
+@app.route('/search')
+def search():
+    if not check_auth():
+        return redirect(url_for('login'))
+    return render_template('search.html')
 
 @app.route('/signup')
 def signup():

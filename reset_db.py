@@ -1,23 +1,12 @@
-from main import app, db
-from models import User, LogEntry
+import os
 
-def reset_database():
-    with app.app_context():
-        # Drop all tables
-        db.drop_all()
-        print("Dropped all tables.")
+folders_to_scan = ['template', 'static', '.']
 
-        # Recreate all tables
-        db.create_all()
-        print("Recreated all tables.")
+for folder in folders_to_scan:
+    if os.path.exists(folder):
+        for file in os.listdir(folder):
+            file_path = os.path.join(folder, file)
+            if os.path.isfile(file_path):
+                filename, file_extension = os.path.splitext(file)
 
-        # Optionally, you can add some initial data here
-        # Example:
-        # user = User(email='admin@example.com', developer_tag='admin')
-        # user.set_password('adminpassword')
-        # db.session.add(user)
-        # db.session.commit()
-        # print("Added initial data.")
-
-if __name__ == '__main__':
-    reset_database()
+                print(f"@{filename}{file_extension}")

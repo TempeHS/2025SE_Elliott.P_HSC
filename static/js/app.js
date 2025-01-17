@@ -46,3 +46,50 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+// Search functionality
+if (document.getElementById('searchForm')) {
+    document.getElementById('searchForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const date = document.getElementById('dateSearch').value;
+        const project = document.getElementById('projectSearch').value;
+        const content = document.getElementById('contentSearch').value;
+        
+        const params = new URLSearchParams();
+        if (date) params.append('date', date);
+        if (project) params.append('project', project);
+        if (content) params.append('content', content);
+        
+        try {
+            const response = await fetch(`/api/entries/search?${params.toString()}`);
+            const results = await response.json();
+            
+            const resultsDiv = document.getElementById('searchResults');
+            resultsDiv.innerHTML = '';
+            
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div class="alert alert-info">No results found</div>';
+                return;
+            }
+            
+            const resultsList = results.map(entry => `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">${entry.project}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            ${new Date(entry.timestamp).toLocaleString()} - ${entry.developer}
+                        </h6>
+                        <p class="card-text">${entry.content}</p>
+                    </div>
+                </div>
+            `).join('');
+            
+            resultsDiv.innerHTML = resultsList;
+        } catch (error) {
+            console.error('Search failed:', error);
+            document.getElementById('searchResults').innerHTML = 
+                '<div class="alert alert-danger">Search failed. Please try again.</div>';
+        }
+    });
+}

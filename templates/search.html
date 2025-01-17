@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center">Search Developer Logs</h2>
+                </div>
+                <div class="card-body">
+                    <form id="searchForm" class="mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <input type="date" class="form-control" id="dateSearch" name="date">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="projectSearch" name="project" placeholder="Project name...">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="contentSearch" name="content" placeholder="Content...">
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <button type="submit" class="btn btn-primary">Search</button>
+                        </div>
+                    </form>
+                    
+                    <div id="searchResults" class="mt-4">
+                        <!-- Results will be dynamically populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
