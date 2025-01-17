@@ -1,179 +1,33 @@
 {% extends "base.html" %}
 
-<<<<<<< HEAD
-{% block title %}Search Entries{% endblock %}
-
-{% block nav %}
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">DevLog</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/search">Search</a>
-                </li>
-            </ul>
-            <div id="userInfo" class="navbar-text">
-            </div>
-        </div>
-    </div>
-</nav>
-{% endblock %}
-
 {% block content %}
-<div class="container">
-    <div class="row">
-        <h1 class="display-1">Search Entries</h1>
-    </div>
-    <div class="row">
-        <form id="searchForm">
-            <div class="mb-3">
-                <label for="projectSelect" class="form-label">Project</label>
-                <select class="form-select" id="projectSelect">
-                    <option value="" disabled selected>Select a project</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="dateSelect" class="form-label">Date</label>
-                <input type="date" class="form-control" id="dateSelect">
-            </div>
-            <div class="mb-3">
-                <input type="text" class="form-control" placeholder="Search by content" id="contentSearch">
-            </div>
-            <div class="mb-3">
-                <label for="filterSelect" class="form-label">Filter By</label>
-                <select class="form-select" id="filterSelect">
-                    <option value="project">Project</option>
-                    <option value="content">Content</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="sortSelect" class="form-label">Sort By Date</label>
-                <select class="form-select" id="sortSelect">
-                    <option value="asc">Ascending</option>
-                    <option value="desc">Descending</option>
-                </select>
-            </div>
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button type="submit" class="btn btn-primary">Search</button>
-        </form>
-    </div>
-    <div class="row mt-4" id="searchResults"></div>
-</div>
-<script>
-document.addEventListener('DOMContentLoaded', async function () {
-    const projectSelect = document.getElementById('projectSelect');
-    const response = await fetch('/api/projects');
-    const projects = await response.json();
-    projects.forEach(project => {
-        const option = document.createElement('option');
-        option.value = project;
-        option.textContent = project;
-        projectSelect.appendChild(option);
-    });
-
-    document.getElementById('searchForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const csrfToken = e.target.querySelector('input[name="csrf_token"]').value;
-        const project = e.target.querySelector('#projectSelect').value;
-        const date = e.target.querySelector('#dateSelect').value;
-        const content = e.target.querySelector('#contentSearch').value;
-        const filter = e.target.querySelector('#filterSelect').value;
-        const sort = e.target.querySelector('#sortSelect').value;
-        const query = new URLSearchParams({
-            project,
-            date,
-            content,
-            filter,
-            sort
-        }).toString();
-        console.log('search query:', query);
-        try {
-            const response = await fetch(`/api/entries/search?${query}`, {
-                method: 'GET',
-                headers: {
-                    'X-CSRFToken': csrfToken
-                }
-            });
-            const results = await response.json();
-            const searchResultsDiv = document.getElementById('searchResults');
-            searchResultsDiv.innerHTML = '';
-            if (response.ok) {
-                results.forEach(entry => {
-                    const entryDiv = document.createElement('div');
-                    entryDiv.className = 'card mb-3';
-                    entryDiv.innerHTML = `
-                        <div class="card-body">
-                            <h5 class="card-title">${entry.project}</h5>
-                            <p class="card-text">${entry.content}</p>
-                            <p class="card-text"><small class="text-muted">Created by ${entry.developer} on ${entry.timestamp}</small></p>
-                        </div>
-                    `;
-                    searchResultsDiv.appendChild(entryDiv);
-                });
-            } else {
-                console.error('search failed:', results.error);
-            }
-        } catch (error) {
-            console.error('search error:', error);
-        }
-    });
-});
-</script>
-{% endblock %}
-=======
-{% block content %}
-<div class="container mt-5">
+<div class="container-fluid mt-4">
     <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card fade-in">
+        <div class="col-md-8">
+            <div class="card">
                 <div class="card-header">
-                    <h2 class="text-center mb-0">search_logs</h2>
+                    <h2 class="text-center">Search Developer Logs</h2>
                 </div>
                 <div class="card-body">
                     <form id="searchForm" class="mb-4">
                         <div class="row g-3">
-                            <div class="col-md-3">
-                                <input type="date" 
-                                       class="form-control" 
-                                       id="dateSearch">
+                            <div class="col-md-4">
+                                <input type="date" class="form-control" id="dateSearch" name="date">
                             </div>
-                            <div class="col-md-3">
-                                <input type="text" 
-                                       class="form-control" 
-                                       id="projectSearch" 
-                                       list="projectList"
-                                       placeholder="project_name">
-                                <datalist id="projectList"></datalist>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="projectSearch" name="project" placeholder="Project name...">
                             </div>
-                            <div class="col-md-3">
-                                <input type="text" 
-                                       class="form-control" 
-                                       id="developerSearch"
-                                       list="developerList" 
-                                       placeholder="developer_tag">
-                                <datalist id="developerList"></datalist>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="contentSearch" name="content" placeholder="Content...">
                             </div>
-                            <div class="col-md-3">
-                                <select class="form-control" id="sortField">
-                                    <option value="date">sort_by_date</option>
-                                    <option value="project">sort_by_project</option>
-                                </select>
-                                <select class="form-control mt-2" id="sortOrder">
-                                    <option value="desc">descending</option>
-                                    <option value="asc">ascending</option>
-                                </select>
-                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <button type="submit" class="btn btn-primary">Search</button>
                         </div>
                     </form>
                     
-                    <div id="searchResults" class="mt-4 fade-in">
+                    <div id="searchResults" class="mt-4">
+                        <!-- Results will be dynamically populated here -->
                     </div>
                 </div>
             </div>
@@ -181,12 +35,3 @@ document.addEventListener('DOMContentLoaded', async function () {
     </div>
 </div>
 {% endblock %}
-
-{% block message_box %}
-<div class="container mt-4">
-    <div class="message-box">
-        <p class="mono-text">search_logs :: explore_development_history</p>
-    </div>
-</div>
-{% endblock %}
->>>>>>> fork/main

@@ -4,176 +4,51 @@
 
 <<<<<<< HEAD
 {% block nav %}
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">DevLog</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="newEntryNav">New Entry</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/search">Search</a>
-                </li>
-            </ul>
-            <div id="userInfo" class="navbar-text">
-            </div>
+<div class="container-fluid">
+    <a class="navbar-brand" href="#">DevLog</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="#" id="newEntryNav">New Entry</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" id="searchNav">Search</a>
+            </li>
+        </ul>
+        <div id="userInfo" class="navbar-text">
         </div>
-=======
-
-{% block content %}
-<div class="container mt-4">
-    <form id="entryForm">
-        <div class="form-group mb-3">
-            <label for="project" class="form-label">project</label>
-            <input type="text" 
-                   class="form-control" 
-                   id="project" 
-                   list="projectList" 
-                   autocomplete="off"
-                   placeholder="Select or type project name"
-                   required>
-            <datalist id="projectList"></datalist>
-        </div>
-        <div class="form-group mb-3">
-            <label for="content" class="form-label">content</label>
-            <textarea class="form-control" id="content" rows="3" required></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary mt-3">create Entry</button>
-    </form>
-</div>
-    
-<div class="container mt-4">
-    <div class="d-grid gap-2 col-6 mx-auto">
-        <a href="{{ url_for('search') }}" class="btn search-link btn-lg">
-            search entries
-        </a>
     </div>
 </div>
 {% endblock %}
 
-{% block message_box %}
-<div class="container mt-4">
-    <div class="message-box">
-        <p class="mono-text">new_entry :: what'd_ya_do?</p>
->>>>>>> fork/main
-    </div>
-</nav>
-{% endblock %}
-
 {% block content %}
-<div id="authSection" class="mb-4"></div>
-<div id="logEntries">
-    <div class="card">
-        <div class="card-body">
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2>Create a New Diary Entry</h2>
             <form id="entryForm">
                 <div class="mb-3">
-                    <label for="projectSelect" class="form-label">Project</label>
-                    <select class="form-select" id="projectSelect" required>
-                        <option value="" disabled selected>Select a project</option>
-                    </select>
+                    <label for="project" class="form-label">Project</label>
+                    <input type="text" class="form-control" id="project" name="project" required>
                 </div>
                 <div class="mb-3">
-                    <textarea class="form-control" placeholder="Content" required></textarea>
+                    <label for="content" class="form-label">Content</label>
+                    <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
                 </div>
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="btn btn-primary">Create Entry</button>
             </form>
         </div>
     </div>
-    <div class="card mt-4">
-        <div class="card-body">
-            <form id="projectForm">
-                <div class="mb-3">
-                    <label for="newProject" class="form-label">New Project</label>
-                    <input type="text" class="form-control" id="newProject" placeholder="Project Name" required>
-                </div>
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="btn btn-primary">Create Project</button>
-            </form>
+    
+    <div class="container mt-4">
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <a href="{{ url_for('search') }}" class="btn btn-primary btn-lg">
+                Search Developer Logs
+            </a>
         </div>
     </div>
-    <div class="mt-4">
-        <a href="/search" class="btn btn-secondary btn-lg btn-block">Search Entries</a>
-    </div>
 </div>
-<<<<<<< HEAD
-<script>
-document.addEventListener('DOMContentLoaded', async function () {
-    const projectSelect = document.getElementById('projectSelect');
-    const response = await fetch('/api/projects');
-    const projects = await response.json();
-    projects.forEach(project => {
-        const option = document.createElement('option');
-        option.value = project;
-        option.textContent = project;
-        projectSelect.appendChild(option);
-    });
-
-    document.getElementById('entryForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const csrfToken = e.target.querySelector('input[name="csrf_token"]').value;
-        const data = {
-            project: e.target.querySelector('#projectSelect').value,
-            content: e.target.querySelector('textarea').value
-        };
-        console.log('entry data:', data);
-        try {
-            const response = await fetch('/api/entries', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
-                body: JSON.stringify(data)
-            });
-            const result = await response.json();
-            if (response.ok) {
-                console.log('entry created:', result);
-                // Optionally, you can update the UI to show the new entry
-            } else {
-                console.error('entry creation failed:', result.error);
-            }
-        } catch (error) {
-            console.error('entry creation error:', error);
-        }
-    });
-
-    document.getElementById('projectForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const csrfToken = e.target.querySelector('input[name="csrf_token"]').value;
-        const newProject = e.target.querySelector('#newProject').value;
-        console.log('new project:', newProject);
-        try {
-            const response = await fetch('/api/projects', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
-                body: JSON.stringify({ project: newProject })
-            });
-            const result = await response.json();
-            if (response.ok) {
-                console.log('project created:', result);
-                const option = document.createElement('option');
-                option.value = newProject;
-                option.textContent = newProject;
-                projectSelect.appendChild(option);
-                e.target.reset();
-            } else {
-                console.error('project creation failed:', result.error);
-            }
-        } catch (error) {
-            console.error('project creation error:', error);
-        }
-    });
-});
-</script>
 {% endblock %}
-=======
-{% endblock %}
->>>>>>> fork/main
