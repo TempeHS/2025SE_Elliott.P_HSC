@@ -6,7 +6,6 @@ from . import api
 from .data_manager import DataManager
 from .user_manager import UserManager
 
-#when get POST request, check credentials and handle errors
 @api.route('/auth/login', methods=['POST'])
 def login():
     print("Login attempt received")
@@ -32,7 +31,6 @@ def login():
         print(f"Login error: {str(e)}")
         return jsonify({'error': str(e)}), 400
 
-#when get POST request, validate data and create new user
 @api.route('/auth/signup', methods=['POST'])
 def signup():
     print("Signup attempt received")
@@ -62,7 +60,6 @@ def signup():
         print(f"Signup error: {str(e)}")
         return jsonify({'error': str(e)}), 400
 
-#havent implemented yet !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 @api.route('/auth/logout', methods=['POST'])
 def logout():
     try:
