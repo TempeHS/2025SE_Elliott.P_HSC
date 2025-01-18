@@ -24,30 +24,32 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <h2>Create a New Diary Entry</h2>
-            <form id="entryForm">
-                <div class="mb-3">
-                    <label for="project" class="form-label">Project</label>
-                    <input type="text" class="form-control" id="project" name="project" required>
-                </div>
-                <div class="mb-3">
-                    <label for="content" class="form-label">Content</label>
-                    <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Create Entry</button>
-            </form>
+<div class="container mt-4">
+    <form id="entryForm">
+        <div class="form-group mb-3">
+            <label for="project" class="form-label">Project</label>
+            <input type="text" 
+                   class="form-control" 
+                   id="project" 
+                   list="projectList" 
+                   autocomplete="off"
+                   placeholder="Select or type project name"
+                   required>
+            <datalist id="projectList"></datalist>
         </div>
-    </div>
+        <div class="form-group mb-3">
+            <label for="content" class="form-label">Content</label>
+            <textarea class="form-control" id="content" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Create Entry</button>
+    </form>
+</div>
     
-    <div class="container mt-4">
-        <div class="d-grid gap-2 col-6 mx-auto">
-            <a href="{{ url_for('search') }}" class="btn btn-primary btn-lg">
-                Search Developer Logs
-            </a>
-        </div>
+<div class="container mt-4">
+    <div class="d-grid gap-2 col-6 mx-auto">
+        <a href="{{ url_for('search') }}" class="btn btn-primary btn-lg">
+            Search Developer Logs
+        </a>
     </div>
 </div>
 {% endblock %}

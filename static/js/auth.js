@@ -1,82 +1,109 @@
-export class Auth {
-    constructor() {
-        console.log('Auth class initialized');
-        this.setupUI();
-        this.bindEvents();
-        this.csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-    }
-
-    setupUI() {
-        this.loginForm = document.getElementById('loginForm');
-        this.signupForm = document.getElementById('signupForm');
-    }
-
-    bindEvents() {
-        if (this.loginForm) {
-            this.loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const formData = new FormData(this.loginForm);
-                await this.login(formData);
-            });
-        }
-
-        if (this.signupForm) {
-            this.signupForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const formData = new FormData(this.signupForm);
-                await this.signup(formData);
-            });
-        }
-    }
-
-    async login(formData) {
-        try {
-            const response = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': this.csrfToken,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(Object.fromEntries(formData)),
-                credentials: 'same-origin'
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                window.location.href = data.redirect || '/';
-            } else {
-                alert(data.error || 'Login failed');
-            }
-        } catch (error) {
-            alert('Login failed. Please try again.');
-        }
-    }
-
-    async signup(formData) {
-        try {
-            const response = await fetch('/api/auth/signup', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': this.csrfToken,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(Object.fromEntries(formData)),
-                credentials: 'same-origin'
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                window.location.href = data.redirect || '/';
-            } else {
-                alert(data.error || 'Signup failed');
-            }
-        } catch (error) {
-            alert('Signup failed. Please try again.');
-        }
-    }
-}
-
-// Initialize auth when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    new Auth();
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            console.log('Login form submitted');
+            
+            const formData = {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+            console.log('Form data prepared:', formData);
+
+            try {
+                console.log('Sending login request...');
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify(formData)
+                });
+                console.log('Response received:', response);
+
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (response.ok) {
+                    window.location.href = data.redirect;
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                const errorDiv = document.getElementById('loginError');
+                if (errorDiv) {
+                    errorDiv.textContent = error.message;
+                    errorDiv.style.display = 'block';
+                }
+            }
+        });
+    }
+
+    if (signupForm) {
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            console.log('Signup form submitted');
+            
+            const formData = {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                developer_tag: document.getElementById('developer_tag').value
+            };
+            console.log('Form data prepared:', formData);
+
+            try {
+                console.log('Sending signup request...');
+                const response = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify(formData)
+                });
+                console.log('Response received:', response);
+
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (response.ok) {
+                    window.location.href = data.redirect;
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                const errorDiv = document.getElementById('signupError');
+                if (errorDiv) {
+                    errorDiv.textContent = error.message;
+                    errorDiv.style.display = 'block';
+                }
+            }
+        });
+    }
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    window.location.href = data.redirect;
+                }
+            } catch (error) {
+                console.error('Logout failed:', error);
+            }
+        });
+    }
 });

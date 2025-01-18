@@ -1,32 +1,80 @@
-from flask import jsonify, request, session
-from models import LogEntry, db, User
+from flask import jsonify, request
+from datetime import datetime
+from models import LogEntry, db
 from . import api
+from .data_manager import DataManager
+from .user_manager import UserManager
+import logging
+
+# Configure logging to output to terminal
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 @api.route('/entries', methods=['POST'])
 def create_entry():
+    print("\n=== NEW ENTRY CREATION ATTEMPT ===")
+    
+    user = UserManager.get_current_user()
+    if not user:
+        print("ERROR: No authenticated user found")
+        return jsonify({'error': 'Authentication required'}), 401
+
     try:
         data = request.get_json()
-        if not data or 'project' not in data or 'content' not in data:
-            return jsonify({'error': 'Missing required fields'}), 400
+        if not data:
+            print("ERROR: No JSON data in request")
+            return jsonify({'error': 'No data provided'}), 400
 
-        user_id = session.get('user_id')
-        if not user_id:
-            return jsonify({'error': 'Unauthorized'}), 401
-
-        user = User.query.get(user_id)
-        if not user:
-            return jsonify({'error': 'User not found'}), 404
-
+        # Create entry with current user's developer tag
         entry = LogEntry(
-            project=data['project'],
-            content=data['content'],
-            developer_tag=user.developer_tag
+            project=DataManager.sanitize_project(data.get('project')),
+            content=DataManager.sanitize_content(data.get('content')),
+            timestamp=datetime.utcnow(),
+            developer_tag=user.developer_tag  # Automatically use authenticated user's tag
         )
 
+        print(f"Creating entry for project '{entry.project}' by {entry.developer_tag}")
+        
         db.session.add(entry)
         db.session.commit()
+        
+        print(f"SUCCESS: Entry created with ID: {entry.id}")
+        return jsonify({
+            'status': 'success',
+            'message': 'Entry created successfully',
+            'entry': entry.to_dict()
+        }), 201
 
-        return jsonify({'message': 'Entry created successfully', 'entry': entry.to_dict()}), 201
     except Exception as e:
+        print(f"ERROR during entry creation: {str(e)}")
         db.session.rollback()
-        return jsonify({'error': str(e)}), 400
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        print("=== ENTRY CREATION ATTEMPT COMPLETE ===\n")
+
+@api.route('/entries/metadata', methods=['GET'])
+def get_metadata():
+    print("\n=== FETCHING METADATA ===")
+    try:
+        # Get unique projects
+        projects = db.session.query(LogEntry.project).distinct().all()
+        project_list = sorted([project[0] for project in projects])
+        
+        # Get unique developers
+        developers = db.session.query(LogEntry.developer_tag).distinct().all()
+        developer_list = sorted([dev[0] for dev in developers])
+        
+        print(f"Found {len(project_list)} projects and {len(developer_list)} developers")
+        
+        return jsonify({
+            'projects': project_list,
+            'developers': developer_list
+        })
+        
+    except Exception as e:
+        print(f"ERROR fetching metadata: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+    
+    finally:
+        print("=== METADATA FETCH COMPLETE ===\n")
