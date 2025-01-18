@@ -3,10 +3,7 @@ from datetime import datetime, timedelta
 from models import User, db
 from .data_manager import DataManager
 
-# user authentication and session management
-
 class UserManager:
-    # handles login checks and session management
     SESSION_TIMEOUT = timedelta(hours=1)
 
     @staticmethod
@@ -22,7 +19,6 @@ class UserManager:
         print("Authentication failed")
         return None
 
-    # creates new users safely
     @staticmethod
     def create_user(email, password, developer_tag):
         email = DataManager.sanitize_email(email)
@@ -38,7 +34,6 @@ class UserManager:
         db.session.add(user)
         return user
 
-#check if session is legit and not expired
     @staticmethod
     def check_session():
         if 'user_id' not in session:

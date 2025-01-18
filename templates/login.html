@@ -1,44 +1,26 @@
 {% extends 'layout.html' %}
 {% block content %}
-<<<<<<< HEAD
-<div class="container">
-    <div class="row">
-        <h1 class="display-1">Login</h1>
-    </div>
-    <div class="row">
-        <form id="loginForm">
-            <div class="mb-3">
-                <input type="email" class="form-control" placeholder="Email" required>
-=======
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div id="authSection">
                 <form id="loginForm">
                     <div class="form-group">
-                        <label for="email">email</label>
+                        <label for="email">Email</label>
                         <input type="email" class="form-control" id="email" required>
                     </div>
                     <div class="form-group">
-                        <label for="password">password</label>
+                        <label for="password">Password</label>
                         <input type="password" class="form-control" id="password" required>
                     </div>
                     <div id="loginError" class="alert alert-danger" style="display: none;"></div>
-                    <button type="submit" class="btn btn-primary">authenticate</button>
+                    <button type="submit" class="btn btn-primary">Login</button>
                 </form>
                 <div class="mt-3">
-                    <a href="{{ url_for('signup') }}" class="btn btn-secondary">sign up</a>
+                    <a href="{{ url_for('signup') }}" class="btn btn-secondary">Create New Account</a>
                 </div>
->>>>>>> fork/main
             </div>
-            <div class="mb-3">
-                <input type="password" class="form-control" placeholder="Password" required>
-            </div>
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button type="submit" class="btn btn-primary">Login</button>
-        </form>
-        <div id="loginError" class="alert alert-danger mt-3" style="display: none;"></div>
-        <p>Don't have an account? <a href="/signup">Sign up here</a></p>
+        </div>
     </div>
 </div>
 <<<<<<< HEAD

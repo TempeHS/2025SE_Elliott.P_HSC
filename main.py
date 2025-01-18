@@ -1,17 +1,21 @@
-from flask import Flask, render_template, request, session, redirect, url_for
+from flask import Flask, render_template, request, session, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager
+import logging
 from models import db, User
 from api import api
-from config import Config
 import os
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
 
 # Initialize CSRF protection
-csrf = CSRFProtect(app)
+csrf = CSRFProtect()
 csrf.init_app(app)
 
 # Initialize LoginManager
@@ -26,17 +30,14 @@ db_path = os.path.join(basedir, '.databaseFiles', 'devlog.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# CSRF Configuration
+app.config['WTF_CSRF_CHECK_DEFAULT'] = False
+app.config['WTF_CSRF_HEADERS'] = ['X-CSRF-TOKEN']
+
 db.init_app(app)
 app.register_blueprint(api, url_prefix='/api')
 
-@app.after_request
-def add_security_headers(response):
-    for key, value in Config.CSP.items():
-        response.headers[f'Content-Security-Policy'] = '; '.join(f"{k} {v}" for k, v in Config.CSP.items())
-    response.headers['X-Content-Type-Options'] = 'nosniff'
-    response.headers['X-Frame-Options'] = 'DENY'
-    response.headers['X-XSS-Protection'] = '1; mode=block'
-    return response
+print("Available routes:", [str(rule) for rule in app.url_map.iter_rules()])
 
 def check_auth():
     return 'user_id' in session
@@ -47,7 +48,11 @@ def index():
         return redirect(url_for('login'))
     return render_template('index.html')
 
-
+@app.route('/signup')
+def signup():
+    if check_auth():
+        return redirect(url_for('index'))
+    return render_template('signup.html')
 
 @app.route('/login')
 def login():
@@ -61,15 +66,16 @@ def search():
         return redirect(url_for('login'))
     return render_template('search.html')
 
-@app.route('/signup')
-def signup():
-    if check_auth():
-        return redirect(url_for('index'))
-    return render_template('signup.html')
-
 @app.before_request
 def log_request():
-    print(f"Request: {request.method} {request.path}")
+    logger.info(f"Request: {request.method} {request.path}")
+    if request.is_json:
+        logger.info(f"JSON Data: {request.get_json()}")
+
+@app.errorhandler(Exception)
+def handle_error(error):
+    logger.error(f"Error occurred: {str(error)}", exc_info=True)
+    return jsonify({'error': str(error)}), 500
 
 @login_manager.user_loader
 def load_user(user_id):

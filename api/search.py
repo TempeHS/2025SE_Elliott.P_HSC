@@ -5,7 +5,6 @@ from . import api
 from .data_manager import DataManager
 from .user_manager import UserManager
 
-# when a search request is received, check session then go ahead
 @api.route('/entries/search', methods=['GET'])
 def search_entries():
     print("\n=== SEARCH REQUEST RECEIVED ===")
@@ -16,7 +15,7 @@ def search_entries():
         query = LogEntry.query
         params_used = []
 
-        # parameter fiddling
+        # Individual parameter handling
         if request.args.get('date'):
             date = datetime.strptime(request.args.get('date'), '%Y-%m-%d')
             query = query.filter(db.func.date(LogEntry.timestamp) == date.date())
@@ -32,7 +31,7 @@ def search_entries():
             query = query.filter(LogEntry.developer_tag == dev_tag)
             params_used.append(f"developer: {dev_tag}")
 
-        #sort
+        # Sorting
         sort_field = request.args.get('sort_field', 'date')
         sort_order = request.args.get('sort_order', 'desc')
         
