@@ -1,8 +1,10 @@
-// Entry Creation Module
+
 document.addEventListener('DOMContentLoaded', () => {
+    // api/entries
     initializeEntryCreation();
-    initializeSearch();
     loadProjectSuggestions();
+    // api/search
+    initializeSearch();
 });
 
 function initializeEntryCreation() {
@@ -31,6 +33,8 @@ async function loadProjectSuggestions() {
     }
 }
 
+// front-end stuff for entries and search, just dont touch
+// handles form submission and exceptions
 async function handleEntrySubmission(e) {
     e.preventDefault();
     
@@ -39,8 +43,13 @@ async function handleEntrySubmission(e) {
         content: document.getElementById('content').value
     };
     
-    console.log('Submitting entry:', formData);
+    // validates form data
+    if (!formData.project || !formData.content) {
+        showNotification('Please fill in all fields', 'error');
+        return;
+    }
 
+    // sends to api
     try {
         const response = await fetch('/api/entries', {
             method: 'POST',
@@ -52,43 +61,25 @@ async function handleEntrySubmission(e) {
         });
 
         const data = await response.json();
-        console.log('Server response:', data);
 
+        // shows success/error message
         if (response.ok) {
             entryForm.reset();
             showNotification('Entry created successfully!', 'success');
-            loadProjectSuggestions(); // Refresh project list after new entry
+            loadProjectSuggestions();
         } else {
             throw new Error(data.error || 'Failed to create entry');
         }
     } catch (error) {
-        console.error('Error:', error);
         showNotification(error.message, 'error');
     }
 }
 
-// Search Module
-function initializeSearch() {
-    const searchForm = document.getElementById('searchForm');
-    const sortField = document.getElementById('sortField');
-    const sortOrder = document.getElementById('sortOrder');
-    
-    if (searchForm) {
-        loadSearchMetadata();
-        searchForm.addEventListener('submit', handleSearchSubmission);
-        
-        // Add listeners for immediate updates
-        sortField.addEventListener('change', handleSearchSubmission);
-        sortOrder.addEventListener('change', handleSearchSubmission);
-        
-        // Add listeners to search inputs for real-time filtering
-        document.getElementById('dateSearch').addEventListener('change', handleSearchSubmission);
-        document.getElementById('projectSearch').addEventListener('input', handleSearchSubmission);
-        document.getElementById('developerSearch').addEventListener('input', handleSearchSubmission);
-    }
-}
+// search handling - talks to /api/search
 async function handleSearchSubmission(e) {
     e.preventDefault();
+
+    // builds search params
     const params = new URLSearchParams({
         project: document.getElementById('projectSearch').value || '',
         developer_tag: document.getElementById('developerSearch').value || '',
@@ -97,6 +88,7 @@ async function handleSearchSubmission(e) {
         sort_order: document.getElementById('sortOrder').value || 'desc'
     });
 
+    // gets results from api
     try {
         const response = await fetch(`/api/entries/search?${params}`);
         const results = await response.json();
@@ -105,13 +97,14 @@ async function handleSearchSubmission(e) {
             throw new Error(results.error);
         }
         
+        // updates results display
         displaySearchResults(results);
     } catch (error) {
         showNotification(error.message, 'error');
     }
 }
 
-// Utility Functions for Search
+// search utils 
 async function loadSearchMetadata() {
     try {
         const response = await fetch('/api/entries/metadata');

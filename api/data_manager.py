@@ -2,6 +2,11 @@ import re
 from datetime import datetime
 
 class DataManager:
+    
+    
+    # <sanitize stuff start-------!>
+    
+    
     @staticmethod
     def sanitize_email(email):
         return email.strip().lower()
@@ -44,3 +49,8 @@ class DataManager:
             except ValueError:
                 raise ValueError("Invalid date format")
         return clean_params
+
+
+    #<sanitize stuff ------!>
+
+        # <should probably include some validation exception handling here

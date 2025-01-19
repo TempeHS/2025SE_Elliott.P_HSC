@@ -6,10 +6,11 @@ from .data_manager import DataManager
 from .user_manager import UserManager
 import logging
 
-# Configure logging to output to terminal
+# logging setup for terminal output
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# when get POST request; check auth, create new entries
 @api.route('/entries', methods=['POST'])
 def create_entry():
     print("\n=== NEW ENTRY CREATION ATTEMPT ===")
@@ -25,12 +26,12 @@ def create_entry():
             print("ERROR: No JSON data in request")
             return jsonify({'error': 'No data provided'}), 400
 
-        # Create entry with current user's developer tag
+        # create entry 
         entry = LogEntry(
             project=DataManager.sanitize_project(data.get('project')),
             content=DataManager.sanitize_content(data.get('content')),
             timestamp=datetime.utcnow(),
-            developer_tag=user.developer_tag  # Automatically use authenticated user's tag
+            developer_tag=user.developer_tag # automatically use user's tag
         )
 
         print(f"Creating entry for project '{entry.project}' by {entry.developer_tag}")
@@ -53,6 +54,7 @@ def create_entry():
     finally:
         print("=== ENTRY CREATION ATTEMPT COMPLETE ===\n")
 
+#when get a GET request; return all projects and developers
 @api.route('/entries/metadata', methods=['GET'])
 def get_metadata():
     print("\n=== FETCHING METADATA ===")

@@ -1,11 +1,29 @@
-{% extends 'layout.html' %}
-{% block content %}
-<div class="container">
-    <div class="row">
-        <h1 class="display-1">Privacy Policy</h1>
-    </div>
-    <div class="row">
+{% extends "base.html" %}
 
+{% block message_box %}
+<div class="container mt-4">
+    <div class="message-box">
+        <p class="mono-text">privacy_policy :: data_protection_information</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Privacy Policy</h2>
+        </div>
+        <div class="card-body">
+            <h3>Data Collection</h3>
+            <p>We collect only essential information needed for the DevLog functionality.</p>
+            
+            <h3>Data Usage</h3>
+            <p>Your data is used solely for maintaining your developer logs and account functionality.</p>
+            
+            <h3>Data Protection</h3>
+            <p>We implement security measures to protect your information.</p>
+        </div>
     </div>
 </div>
 {% endblock %}
