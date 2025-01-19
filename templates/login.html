@@ -6,59 +6,23 @@
             <div id="authSection">
                 <form id="loginForm">
                     <div class="form-group">
-                        <label for="email">Email</label>
+                        <label for="email">email</label>
                         <input type="email" class="form-control" id="email" required>
                     </div>
                     <div class="form-group">
-                        <label for="password">Password</label>
+                        <label for="password">password</label>
                         <input type="password" class="form-control" id="password" required>
                     </div>
                     <div id="loginError" class="alert alert-danger" style="display: none;"></div>
-                    <button type="submit" class="btn btn-primary">Login</button>
+                    <button type="submit" class="btn btn-primary">authenticate</button>
                 </form>
                 <div class="mt-3">
-                    <a href="{{ url_for('signup') }}" class="btn btn-secondary">Create New Account</a>
+                    <a href="{{ url_for('signup') }}" class="btn btn-secondary">sign up</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<<<<<<< HEAD
-<script>
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const csrfToken = e.target.querySelector('input[name="csrf_token"]').value;
-    const data = {
-        email: e.target.querySelector('input[type="email"]').value,
-        password: e.target.querySelector('input[type="password"]').value
-    };
-    console.log('login data:', data);
-    try {
-        const response = await fetch('/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify(data)
-        });
-        const result = await response.json();
-        if (response.ok) {
-            console.log('login successful:', result.message);
-            window.location.href = result.redirect;
-        } else {
-            const errorBox = document.getElementById('loginError');
-            errorBox.style.display = 'block';
-            errorBox.textContent = result.errors ? result.errors.join(', ') : result.error;
-            console.error('login failed:', result.errors || result.error);
-        }
-    } catch (error) {
-        console.error('login error:', error);
-    }
-});
-</script>
-{% endblock %}
-=======
 {% endblock %}
 
 {% block message_box %}
@@ -68,4 +32,3 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     </div>
 </div>
 {% endblock %}
->>>>>>> fork/main
