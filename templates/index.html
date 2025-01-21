@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Developer Log{% endblock %}
+{% block title %}Home(r)_Log{% endblock %}
 
+<<<<<<< HEAD
 {% block nav %}
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
@@ -21,6 +22,44 @@
             <div id="userInfo" class="navbar-text">
             </div>
         </div>
+=======
+
+{% block content %}
+<div class="container mt-4">
+    <form id="entryForm">
+        <div class="form-group mb-3">
+            <label for="project" class="form-label">project</label>
+            <input type="text" 
+                   class="form-control" 
+                   id="project" 
+                   list="projectList" 
+                   autocomplete="off"
+                   placeholder="Select or type project name"
+                   required>
+            <datalist id="projectList"></datalist>
+        </div>
+        <div class="form-group mb-3">
+            <label for="content" class="form-label">content</label>
+            <textarea class="form-control" id="content" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">create Entry</button>
+    </form>
+</div>
+    
+<div class="container mt-4">
+    <div class="d-grid gap-2 col-6 mx-auto">
+        <a href="{{ url_for('search') }}" class="btn search-link btn-lg">
+            search entries
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block message_box %}
+<div class="container mt-4">
+    <div class="message-box">
+        <p class="mono-text">new_entry :: what'd_ya_do?</p>
+>>>>>>> fork/main
     </div>
 </nav>
 {% endblock %}
@@ -61,6 +100,7 @@
         <a href="/search" class="btn btn-secondary btn-lg btn-block">Search Entries</a>
     </div>
 </div>
+<<<<<<< HEAD
 <script>
 document.addEventListener('DOMContentLoaded', async function () {
     const projectSelect = document.getElementById('projectSelect');
@@ -134,3 +174,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 });
 </script>
 {% endblock %}
+=======
+{% endblock %}
+>>>>>>> fork/main

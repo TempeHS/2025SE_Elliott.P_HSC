@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
     <title>{% block title %}DevLog{% endblock %}</title>
     <link rel="stylesheet" href="/static/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
@@ -16,5 +17,56 @@
     </div>
     <script src="/static/js/bootstrap.bundle.min.js"></script>
     <script src="/static/js/app.js"></script>
+=======
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>DevLog</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/icons/Favicons/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/icons/Favicons/favicon-16x16.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/icons/Favicons/favicon.ico') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    {% if not hide_nav %}
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" class="navbar-logo" alt="DevLog Logo">
+                <a class="navbar-brand" href="{{ url_for('index') }}">Home(r)_log_</a>
+            </div>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">new_entry()</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('search') }}">search()</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('privacy') }}">privacy()</a>
+                    </li>
+                </ul>
+                <div id="userInfo" class="navbar-text"></div>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    {% block message_box %}{% endblock %}
+    <main class="fade-in">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/app.js') }}"></script>
+>>>>>>> fork/main
 </body>
 </html>

@@ -1,10 +1,18 @@
+// pwa stuff
 const CACHE_NAME = 'devlog-v1';
+
+// these urls must match routes
 const URLS_TO_CACHE = [
     '/',
     '/static/css/style.css',
     '/static/js/app.js',
     '/static/js/auth.js',
-    '/static/js/logEntry.js'
+    '/static/js/logEntry.js',
+    '/privacy',
+    '/login',
+    '/search'//,
+    //'/logout',
+    //etc..
 ];
 
 self.addEventListener('install', event => {
