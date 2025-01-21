@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevLog</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>{% block title %}DevLog{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="icon" href="/static/images/favicon.ico">
 </head>
 <body>
-    {% include 'partials/menu.html' %}
-    {% block content %}{% endblock %}
-    {% include 'partials/footer.html' %}
-    
-    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    {% block nav %}{% endblock %}
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+    <script src="/static/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/app.js"></script>
 </body>
 </html>

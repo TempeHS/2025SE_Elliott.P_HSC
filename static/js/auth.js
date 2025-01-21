@@ -1,82 +1,133 @@
 export class Auth {
     constructor() {
-        console.log('Auth class initialized');
         this.setupUI();
         this.bindEvents();
-        this.csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     }
 
     setupUI() {
-        this.loginForm = document.getElementById('loginForm');
-        this.signupForm = document.getElementById('signupForm');
+        const authSection = document.getElementById('authSection');
+        authSection.innerHTML = `
+            <div class="card" id="authCard">
+                <div class="card-body">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#login">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#signup">Sign Up</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content mt-3">
+                        <div class="tab-pane fade show active" id="login">
+                            <form id="loginForm">
+                                <div class="mb-3">
+                                    <input type="email" class="form-control" placeholder="Email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="password" class="form-control" placeholder="Password" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Login</button>
+                            </form>
+                        </div>
+                        <div class="tab-pane fade" id="signup">
+                            <form id="signupForm">
+                                <div class="mb-3">
+                                    <input type="email" class="form-control" placeholder="Email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="password" class="form-control" placeholder="Password" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Sign Up</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
     bindEvents() {
-        if (this.loginForm) {
-            this.loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const formData = new FormData(this.loginForm);
-                await this.login(formData);
-            });
-        }
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.login(e.target);
+        });
 
-        if (this.signupForm) {
-            this.signupForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const formData = new FormData(this.signupForm);
-                await this.signup(formData);
+        document.getElementById('signupForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.signup(e.target);
+        });
+    }
+
+    async login(form) {
+        const data = {
+            email: form.querySelector('input[type="email"]').value,
+            password: form.querySelector('input[type="password"]').value
+        };
+
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify(data)
             });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                const result = await response.json();
+                console.error('Login failed:', result.error);
+            }
+        } catch (error) {
+            console.error('Login error:', error);
         }
     }
 
-    async login(formData) {
+    async signup(form) {
+        const data = {
+            email: form.querySelector('input[type="email"]').value,
+            password: form.querySelector('input[type="password"]').value
+        };
+
         try {
-            const response = await fetch('/api/auth/login', {
+            const response = await fetch('/api/signup', {
                 method: 'POST',
                 headers: {
-                    'X-CSRFToken': this.csrfToken,
                     'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content
                 },
-                body: JSON.stringify(Object.fromEntries(formData)),
-                credentials: 'same-origin'
+                body: JSON.stringify(data)
             });
 
-            const data = await response.json();
             if (response.ok) {
-                window.location.href = data.redirect || '/';
+                window.location.reload();
             } else {
-                alert(data.error || 'Login failed');
+                const result = await response.json();
+                console.error('Signup failed:', result.error);
             }
         } catch (error) {
-            alert('Login failed. Please try again.');
+            console.error('Signup error:', error);
         }
     }
 
-    async signup(formData) {
+    async checkAuthStatus() {
+        const userInfo = document.getElementById('userInfo');
         try {
-            const response = await fetch('/api/auth/signup', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': this.csrfToken,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(Object.fromEntries(formData)),
-                credentials: 'same-origin'
-            });
-
-            const data = await response.json();
+            const response = await fetch('/api/user');
             if (response.ok) {
-                window.location.href = data.redirect || '/';
-            } else {
-                alert(data.error || 'Signup failed');
+                const data = await response.json();
+                document.getElementById('authSection').style.display = 'none';
+                userInfo.innerHTML = `
+                    <span>${data.email}</span>
+                    <button class="btn btn-outline-light ms-2" onclick="logout()">Logout</button>
+                `;
             }
         } catch (error) {
-            alert('Signup failed. Please try again.');
+            console.error('Auth check error:', error);
         }
     }
 }
 
-// Initialize auth when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    new Auth();
-});
+// this basically just sets up the UI for the auth section and binds the events for the login and signup forms.

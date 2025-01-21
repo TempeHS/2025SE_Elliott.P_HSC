@@ -1,31 +1,40 @@
-/* Core styles */
-.navbar {
-    padding: 1rem;
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: none;
 }
 
-.card {
-    margin-bottom: 1rem;
-    border-radius: 8px;
+.card-title {
+    color: #2196f3;
+    font-weight: 600;
+}
+
+.form-control:focus {
+    border-color: #2196f3;
+    box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25);
+}
+
+.btn-primary {
+    background-color: #2196f3;
+    border-color: #2196f3;
+}
+
+.btn-primary:hover {
+    background-color: #1976d2;
+    border-color: #1976d2;
+}
+
+.navbar {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.form-control {
-    margin-bottom: 1rem;
+#entriesList .card {
+    transition: transform 0.2s;
 }
 
-.btn {
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
+#entriesList .card:hover {
+    transform: translateY(-2px);
 }
 
-/* Auth section styles */
-#authSection {
-    max-width: 400px;
-    margin: 0 auto;
-}
-
-/* Log entries styles */
-#logEntries {
-    max-width: 800px;
-    margin: 0 auto;
+.text-muted {
+    font-size: 0.9rem;
 }

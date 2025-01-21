@@ -10,17 +10,17 @@
     <form action="/form.html" method="POST" class="box">
       <div class="col-auto">
         <label name="exampleFormControlInput1" class="form-label">Email address</label>
-        <input name="email" type="email" class="form-control" id="exampleFormControlInput1" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2, 4}$" placeholder="name@example.com">
+        <input name="email" type="email" class="form-control" id="exampleFormControlInput1" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" placeholder="name@example.com">
       </div>
       <div class="col-auto">
         <label for="exampleFormControlTextarea1" class="form-label">Example text area</label>
-        <textarea class="form-control" name="text" id="exampleFormControlTextarea1" rows="3"></textarea>
+        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
       </div>
       <br/>
       <div class="col-auto">
-        <button type="submit" class="btn btn-primary mb-3">Submit</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
       </div>
-      <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     </form>
   </div>
 </div>

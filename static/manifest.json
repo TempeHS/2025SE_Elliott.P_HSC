@@ -1,6 +1,6 @@
 {
-    "name": "",
-    "short_name": "",
+    "name": "DevLog",
+    "short_name": "DevLog",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#000",
@@ -71,4 +71,4 @@
       "label": ""
     }
   ]
-  }
+}
