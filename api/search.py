@@ -4,35 +4,42 @@ from models import LogEntry, db
 from . import api
 from .data_manager import DataManager
 from .user_manager import UserManager
+import logging
 
-# when a search request is received, check session then go ahead
+logger = logging.getLogger(__name__)
+
 @api.route('/entries/search', methods=['GET'])
 def search_entries():
-    print("\n=== SEARCH REQUEST RECEIVED ===")
+    logger.info("Search request received")
+    
     if not UserManager.check_session():
-        return jsonify({'error': 'Session expired'}), 401
+        logger.warning("Unauthorized search attempt")
+        return jsonify({'error': 'Authentication required'}), 401
 
     try:
         query = LogEntry.query
-        params_used = []
+        search_params = []
 
-        # parameter fiddling
-        if request.args.get('date'):
-            date = datetime.strptime(request.args.get('date'), '%Y-%m-%d')
-            query = query.filter(db.func.date(LogEntry.timestamp) == date.date())
-            params_used.append(f"date: {date.date()}")
-        
-        if request.args.get('project'):
-            project = request.args.get('project')
+        # Project filter
+        project = DataManager.sanitize_project(request.args.get('project', ''))
+        if project:
             query = query.filter(LogEntry.project.ilike(f"%{project}%"))
-            params_used.append(f"project: {project}")
-        
-        if request.args.get('developer_tag'):
-            dev_tag = request.args.get('developer_tag')
-            query = query.filter(LogEntry.developer_tag == dev_tag)
-            params_used.append(f"developer: {dev_tag}")
+            search_params.append(f"project: {project}")
 
-        #sort
+        # Developer filter
+        developer = DataManager.sanitize_developer_tag(request.args.get('developer_tag', ''))
+        if developer:
+            query = query.filter(LogEntry.developer_tag.ilike(f"%{developer}%"))
+            search_params.append(f"developer: {developer}")
+
+        # Date filter
+        date = request.args.get('date')
+        if date:
+            search_date = datetime.strptime(date, '%Y-%m-%d')
+            query = query.filter(db.func.date(LogEntry.timestamp) == search_date.date())
+            search_params.append(f"date: {date}")
+
+        # Sorting
         sort_field = request.args.get('sort_field', 'date')
         sort_order = request.args.get('sort_order', 'desc')
         
@@ -48,14 +55,12 @@ def search_entries():
             )
 
         entries = query.all()
-        print(f"Search using parameters: {', '.join(params_used)}")
-        print(f"Found {len(entries)} matching entries")
+        logger.info(f"Search completed with params: {', '.join(search_params)}")
+        logger.info(f"Found {len(entries)} matching entries")
+        print("Sending response data:", [entry.to_dict() for entry in entries])
 
         return jsonify([entry.to_dict() for entry in entries])
 
     except Exception as e:
-        print(f"ERROR in search: {str(e)}")
+        logger.error(f"Search error: {str(e)}")
         return jsonify({'error': str(e)}), 400
-
-    finally:
-        print("=== SEARCH REQUEST COMPLETE ===\n")

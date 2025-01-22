@@ -20,7 +20,12 @@
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
             <div class="logo-container">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" class="navbar-logo" alt="DevLog Logo">
+                <picture>
+                    <source srcset="{{ url_for('static', filename='images/icons/Android Icons/192x192.png') }}" media="(min-width: 192px)">
+                    <source srcset="{{ url_for('static', filename='images/icons/Android Icons/144x144.png') }}" media="(min-width: 144px)">
+                    <source srcset="{{ url_for('static', filename='images/icons/Android Icons/96x96.png') }}" media="(min-width: 96px)">
+                    <img src="{{ url_for('static', filename='images/icons/Android Icons/48x48.png') }}" class="navbar-logo" alt="DevLog Logo">
+                </picture>
                 <a class="navbar-brand" href="{{ url_for('index') }}">Home(r)_log_</a>
             </div>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
