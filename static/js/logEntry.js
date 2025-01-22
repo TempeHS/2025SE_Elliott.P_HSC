@@ -83,12 +83,8 @@ export class LogEntry {
             });
 
             if (response.ok) {
-                const result = await response.json();
-                console.log('Entry created:', result);
-                this.displayEntries([result]);
-            } else {
-                const result = await response.json();
-                console.error('Error creating entry:', result.errors);
+                document.getElementById('newEntryForm').reset();
+                this.displayEntries(await response.json());
             }
         } catch (error) {
             console.error('Error creating entry:', error);
@@ -106,12 +102,9 @@ export class LogEntry {
         if (content) params.append('content', content);
 
         try {
-            const response = await fetch(`/api/entries/search?${params.toString()}`);
+            const response = await fetch(`/api/entries/search?${params}`);
             if (response.ok) {
-                const entries = await response.json();
-                this.displayEntries(entries);
-            } else {
-                console.error('Error searching entries');
+                this.displayEntries(await response.json());
             }
         } catch (error) {
             console.error('Error searching entries:', error);
@@ -132,5 +125,3 @@ export class LogEntry {
         `).join('');
     }
 }
-
-// this basically handles the log entry functionality from the frontend to the backend python

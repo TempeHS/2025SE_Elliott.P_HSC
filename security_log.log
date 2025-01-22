@@ -32,3 +32,32 @@
 2024-11-14 13:45:27,957 127.0.0.1 - - [14/Nov/2024 13:45:27] "[36mGET /static/js/app.js HTTP/1.1[0m" 304 -
 2024-11-14 13:45:28,076 {"csp-report":{"document-uri":"https://studious-funicular-g9vwjg7p9r539g77-5000.app.github.dev/?","referrer":"https://studious-funicular-g9vwjg7p9r539g77-5000.app.github.dev/","violated-directive":"manifest-src","effective-directive":"manifest-src","original-policy":"script-src 'self'; img-src 'self' data:; child-src 'self'; default-src 'self'; style-src 'self'; media-src 'self'; object-src 'self'; connect-src 'self'; base-uri 'self'; report-uri /csp_report; font-src 'self'; worker-src 'self'; frame-ancestors 'none'; form-action 'self'; frame-src 'none'","disposition":"enforce","blocked-uri":"https://studious-funicular-g9vwjg7p9r539g77-5000.app.github.dev/static/manifest.json","status-code":200,"script-sample":""}}
 2024-11-14 13:45:28,076 127.0.0.1 - - [14/Nov/2024 13:45:28] "POST /csp_report HTTP/1.1" 200 -
+2024-11-15 02:58:44,548 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-11-15 02:58:44,549 - INFO - [33mPress CTRL+C to quit[0m
+2024-11-15 02:58:45,804 - INFO - 127.0.0.1 - - [15/Nov/2024 02:58:45] "GET /?vscodeBrowserReqId=1731639525870 HTTP/1.1" 200 -
+2024-11-15 02:58:50,755 - INFO - 127.0.0.1 - - [15/Nov/2024 02:58:50] "GET / HTTP/1.1" 200 -
+2024-11-15 02:58:51,017 - INFO - 127.0.0.1 - - [15/Nov/2024 02:58:51] "GET /static/css/style.css HTTP/1.1" 200 -
+2024-11-15 02:58:51,018 - INFO - 127.0.0.1 - - [15/Nov/2024 02:58:51] "[36mGET /static/css/bootstrap.min.css HTTP/1.1[0m" 304 -
+2024-11-15 02:58:51,027 - INFO - 127.0.0.1 - - [15/Nov/2024 02:58:51] "GET /static/js/app.js HTTP/1.1" 200 -
+2024-11-15 02:58:51,038 - INFO - 127.0.0.1 - - [15/Nov/2024 02:58:51] "GET /static/js/auth.js HTTP/1.1" 200 -
+2024-11-15 02:58:51,292 - INFO - 127.0.0.1 - - [15/Nov/2024 02:58:51] "[36mGET /static/js/logEntry.js HTTP/1.1[0m" 304 -
+2024-11-15 02:58:51,296 - INFO - 127.0.0.1 - - [15/Nov/2024 02:58:51] "[33mGET /api/auth/user HTTP/1.1[0m" 404 -
+2024-11-15 02:58:51,321 - INFO - 127.0.0.1 - - [15/Nov/2024 02:58:51] "[33mGET /api/auth/user HTTP/1.1[0m" 404 -
+2024-11-15 02:58:51,574 - INFO - 127.0.0.1 - - [15/Nov/2024 02:58:51] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-11-15 02:58:59,783 - INFO - 127.0.0.1 - - [15/Nov/2024 02:58:59] "[33mPOST /api/auth/login HTTP/1.1[0m" 404 -
+2024-11-15 02:59:59,050 - INFO - 127.0.0.1 - - [15/Nov/2024 02:59:59] "[33mPOST /api/auth/login HTTP/1.1[0m" 404 -
+2024-11-15 03:00:09,099 - INFO - 127.0.0.1 - - [15/Nov/2024 03:00:09] "[33mPOST /api/auth/login HTTP/1.1[0m" 404 -
+2024-11-15 03:00:12,882 - INFO - 127.0.0.1 - - [15/Nov/2024 03:00:12] "[33mPOST /api/auth/login HTTP/1.1[0m" 404 -
+2024-11-15 03:00:31,338 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-11-15 03:00:31,338 - INFO - [33mPress CTRL+C to quit[0m
+2024-11-15 03:00:31,339 - INFO -  * Restarting with stat
+2024-11-15 03:00:31,745 - WARNING -  * Debugger is active!
+2024-11-15 03:00:31,754 - INFO -  * Debugger PIN: 136-286-826
+2024-11-15 03:00:34,361 - INFO - 127.0.0.1 - - [15/Nov/2024 03:00:34] "GET /?vscodeBrowserReqId=1731639633327 HTTP/1.1" 200 -
+2024-11-15 03:20:47,349 - INFO -  * Detected change in '/workspaces/2025SE_Elliott.P_HSC/main.py', reloading
+2024-11-15 03:20:47,405 - INFO -  * Restarting with stat
+2024-11-15 03:20:52,979 - INFO -  * Restarting with stat
+2024-11-15 03:20:57,159 - INFO -  * Restarting with stat
+2024-11-15 03:21:01,326 - INFO -  * Restarting with stat

@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+{% extends "base.html" %}
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
@@ -24,6 +24,14 @@
                 <p class="mt-3">Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
             </div>
         </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block message_box %}
+<div class="container mt-4">
+    <div class="message-box">
+        <p class="mono-text">create_new_account :: join_the_developer_community</p>
     </div>
 </div>
 {% endblock %}

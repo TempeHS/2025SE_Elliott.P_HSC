@@ -1,26 +1,27 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container-fluid mt-4">
+<div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
+        <div class="col-md-10">
+            <div class="card fade-in">
                 <div class="card-header">
-                    <h2 class="text-center">Search Developer Logs</h2>
+                    <h2 class="text-center mb-0">search_logs</h2>
                 </div>
                 <div class="card-body">
                     <form id="searchForm" class="mb-4">
                         <div class="row g-3">
                             <div class="col-md-3">
-                                <input type="date" class="form-control" id="dateSearch" name="date">
+                                <input type="date" 
+                                       class="form-control" 
+                                       id="dateSearch">
                             </div>
                             <div class="col-md-3">
                                 <input type="text" 
                                        class="form-control" 
                                        id="projectSearch" 
                                        list="projectList"
-                                       name="project" 
-                                       placeholder="Project name...">
+                                       placeholder="project_name">
                                 <datalist id="projectList"></datalist>
                             </div>
                             <div class="col-md-3">
@@ -28,30 +29,35 @@
                                        class="form-control" 
                                        id="developerSearch"
                                        list="developerList" 
-                                       name="developer" 
-                                       placeholder="Developer...">
+                                       placeholder="developer_tag">
                                 <datalist id="developerList"></datalist>
                             </div>
                             <div class="col-md-3">
-                                <button type="submit" class="btn btn-primary">Search</button>
-                                <select class="form-select mt-2" id="sortField">
-                                    <option value="date">Sort by Date</option>
-                                    <option value="project">Sort by Project</option>
+                                <select class="form-control" id="sortField">
+                                    <option value="date">sort_by_date</option>
+                                    <option value="project">sort_by_project</option>
                                 </select>
-                                <select class="form-select mt-2" id="sortOrder">
-                                    <option value="desc">Descending</option>
-                                    <option value="asc">Ascending</option>
+                                <select class="form-control mt-2" id="sortOrder">
+                                    <option value="desc">descending</option>
+                                    <option value="asc">ascending</option>
                                 </select>
                             </div>
                         </div>
                     </form>
                     
-                    <div id="searchResults" class="mt-4">
-                        <!-- Results will be dynamically populated here -->
+                    <div id="searchResults" class="mt-4 fade-in">
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block message_box %}
+<div class="container mt-4">
+    <div class="message-box">
+        <p class="mono-text">search_logs :: explore_development_history</p>
     </div>
 </div>
 {% endblock %}

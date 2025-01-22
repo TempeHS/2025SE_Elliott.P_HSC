@@ -50,20 +50,13 @@ def index():
 
 @app.route('/signup')
 def signup():
-    if check_auth():
-        return redirect(url_for('index'))
-    return render_template('signup.html')
+    return render_template('signup.html', hide_nav=True)
 
 @app.route('/login')
 def login():
-    if check_auth():
-        return redirect(url_for('index'))
-    return render_template('login.html')
+    return render_template('login.html', hide_nav=True)
 
 @app.route('/search')
-def search():
-    if not check_auth():
-        return redirect(url_for('login'))
 def search():
     if not check_auth():
         return redirect(url_for('login'))
@@ -82,8 +75,16 @@ def handle_error(error):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
 
+
+@app.route('/privacy')
+def privacy():
+    if not check_auth():
+        return redirect(url_for('login'))
+    return render_template('privacy.html')
+
+#HAVE THIS AT THE END!!!!
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

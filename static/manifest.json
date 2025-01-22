@@ -39,14 +39,6 @@
       "name": "Privacy Policy",
       "url": "/privacy",
       "description": "View privacy policy"
-      "purpose": "any maskable"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Privacy Policy",
-      "url": "/privacy",
-      "description": "View privacy policy"
     }
   ]
 }

@@ -17,6 +17,24 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    @property
+    def is_active(self):
+        return True
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return str(self.id)
+
+    def __repr__(self):
+        return f'<User {self.email}>'
+
 class LogEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     project = db.Column(db.String(100), nullable=False)
@@ -24,11 +42,14 @@ class LogEntry(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     developer_tag = db.Column(db.String(50), db.ForeignKey('user.developer_tag'), nullable=False)
 
+    def __repr__(self):
+        return f'<LogEntry {self.project} by {self.developer_tag}>'
+
     def to_dict(self):
         return {
             'id': self.id,
             'project': self.project,
             'content': self.content,
-            'timestamp': self.timestamp.isoformat(),
+            'timestamp': self.timestamp,
             'developer_tag': self.developer_tag
         }

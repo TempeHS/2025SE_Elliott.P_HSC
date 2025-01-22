@@ -28,5 +28,3 @@ self.addEventListener('fetch', event => {
             .then(response => response || fetch(event.request))
     );
 });
-
-// this file basically caches the static files of the application so that they can be accessed offline

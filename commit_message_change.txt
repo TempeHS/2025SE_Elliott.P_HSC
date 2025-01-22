@@ -1,0 +1,23 @@
+pick 0c96eab Create .gitignore.txt
+r 46e563f Initial website infrastructure and template setup
+r 79323f0 Implement user authentication and session management foundation
+r df53505 Basic authentication system with entry functionality
+r f472b99 Authentication JavaScript improvements
+r 92b6c89 JavaScript refactoring with AI assistance
+r 7fd8f77 Authentication system review preparation
+r 69903cd Frontend error handling and session management updates
+r c15aa31 Werkzeug dependency update
+r f84705f Search functionality and session management completion
+r b2064a9 Code cleanup and optimization
+r 0dd3ce0 Initial deployment version
+r fd72228 Security implementation for user and auth management
+r d44f470 Import structure reorganization
+r dfc627d Import system patches
+r b36a532 Infrastructure rebuild with improved template
+pick 9f49e5c Got site checked, meets requirements, its time to branch off from requirements a little.
+pick 08c3495 Fully fleshed out branch version, user and data manager implemented niceley, more to do!
+pick 41fe888 agile sprint, added the search page and basic search functionality
+pick d19d480 agile sprint fixed sign-up and search functionality finished. moving onto cool styling
+pick 9c3ecd3 agile sprint: fixed the main.py file, and added documentation an style with css and java site wide. next up home page update
+pick 4f9d208 agile sprint, added the search page and basic search functionality such as sort and search by project w drop downs etc. also added index link to search for ease, trying to move to a more twitter-ey web design
+pick 1744d7d agile sprint fixed sign-up and search functionality finished. moving onto cool styling
