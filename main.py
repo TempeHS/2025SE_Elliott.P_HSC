@@ -84,6 +84,18 @@ def privacy():
         return redirect(url_for('login'))
     return render_template('privacy.html')
 
+@app.route('/home')
+def home():
+    if not check_auth():
+        return redirect(url_for('login'))
+    return render_template('home.html')
+
+@app.route('/entry/<int:entry_id>')
+def view_entry(entry_id):
+    if not check_auth():
+        return redirect(url_for('login'))
+    return render_template('entry_veiw.html')
+
 #HAVE THIS AT THE END!!!!
 if __name__ == '__main__':
     with app.app_context():

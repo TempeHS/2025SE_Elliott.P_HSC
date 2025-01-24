@@ -168,3 +168,45 @@ body {
     color: var(--bg-color);
     background-color: var(--main-color);
 }
+
+/* card limits*/
+.card-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.card-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* entry card page */
+.entry-title {
+    word-wrap: break-word;
+    max-width: 100%;
+}
+
+.entry-content {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    line-height: 1.5;
+}
+
+.entry-card {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.entry-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.entry-content {
+    white-space: pre-wrap;
+}

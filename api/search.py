@@ -15,31 +15,42 @@ def search_entries():
     if not UserManager.check_session():
         logger.warning("Unauthorized search attempt")
         return jsonify({'error': 'Authentication required'}), 401
+    
+    # if no search parameters are provided, tell error
+    if not any([
+    request.args.get('project'),
+    request.args.get('developer_tag'),
+    request.args.get('date')
+    ]):
+        return jsonify({'error': 'Please enter at least one search parameter'}), 400
+
 
     try:
         query = LogEntry.query
         search_params = []
 
-        # Project filter
-        project = DataManager.sanitize_project(request.args.get('project', ''))
+        # project filter (only apply if true)
+        project = request.args.get('project', '')
         if project:
+            project = DataManager.sanitize_project(project)
             query = query.filter(LogEntry.project.ilike(f"%{project}%"))
             search_params.append(f"project: {project}")
 
-        # Developer filter
-        developer = DataManager.sanitize_developer_tag(request.args.get('developer_tag', ''))
+        # developer filter (only apply if true)
+        developer = request.args.get('developer_tag', '')
         if developer:
+            developer = DataManager.sanitize_developer_tag(developer)
             query = query.filter(LogEntry.developer_tag.ilike(f"%{developer}%"))
             search_params.append(f"developer: {developer}")
 
-        # Date filter
+        # date filter (only apply if true)
         date = request.args.get('date')
         if date:
             search_date = datetime.strptime(date, '%Y-%m-%d')
-            query = query.filter(db.func.date(LogEntry.timestamp) == search_date.date())
+            query = query.filter(db.func.date(LogEntry.start_time) == search_date.date())
             search_params.append(f"date: {date}")
 
-        # Sorting
+        # sort
         sort_field = request.args.get('sort_field', 'date')
         sort_order = request.args.get('sort_order', 'desc')
         
@@ -50,14 +61,13 @@ def search_entries():
             )
         else:
             query = query.order_by(
-                LogEntry.timestamp.desc() if sort_order == 'desc' 
-                else LogEntry.timestamp.asc()
+                LogEntry.start_time.desc() if sort_order == 'desc' 
+                else LogEntry.start_time.asc()
             )
 
         entries = query.all()
         logger.info(f"Search completed with params: {', '.join(search_params)}")
         logger.info(f"Found {len(entries)} matching entries")
-        print("Sending response data:", [entry.to_dict() for entry in entries])
 
         return jsonify([entry.to_dict() for entry in entries])
 

@@ -6,7 +6,34 @@ class DataManager:
     
     # <sanitize stuff start-------!>
     
+    @staticmethod
+    def sanitize_repository_url(url):
+        if not url:
+            return None
+        url = url.strip()
+        # Simple URL pattern check
+        url_pattern = r'^https?:\/\/(github\.com|gitlab\.com|bitbucket\.org)\/[\w\-\.\/]+$'
+        if not re.match(url_pattern, url):
+            raise ValueError("URL must be a valid repository URL")
+        return url
+
     
+    @staticmethod
+    def validate_timestamps(start_time, end_time):
+        try:
+            start = datetime.fromisoformat(start_time)
+            end = datetime.fromisoformat(end_time)
+            if end <= start:
+                raise ValueError("End time must be after start time")
+            return start, end
+        except ValueError as e:
+            raise ValueError(f"Invalid timestamp format: {str(e)}")
+
+    @staticmethod
+    def calculate_time_worked(start_time, end_time):
+        diff_minutes = (end_time - start_time).total_seconds() / 60
+        return round(diff_minutes / 15) * 15
+
     @staticmethod
     def sanitize_email(email):
         return email.strip().lower()

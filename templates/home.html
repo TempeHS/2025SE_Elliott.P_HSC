@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Welcome, <span class="developer-tag"></span></h2>
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5>Your Projects</h5>
+                                    <p class="project-count"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5>Total Entries</h5>
+                                    <p class="entry-count"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <h3>Your Entries</h3>
+            <div id="userEntries"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block message_box %}
+<div class="container mt-4">
+    <div class="message-box">
+        <p class="mono-text">home :: your_developer_space</p>
+    </div>
+</div>
+{% endblock %}

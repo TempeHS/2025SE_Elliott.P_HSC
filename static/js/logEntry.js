@@ -68,23 +68,28 @@ export class LogEntry {
     }
 
     async createEntry() {
-        const project = document.getElementById('project').value;
-        const content = document.getElementById('content').value;
-        const timestamp = new Date().toISOString();
+        const formData = {
+            project: document.getElementById('project').value,
+            content: document.getElementById('content').value,
+            repository_url: document.getElementById('repository_url').value,
+            start_time: document.getElementById('start_time').value,
+            end_time: document.getElementById('end_time').value
+        };
 
         try {
             const response = await fetch('/api/entries', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 },
-                body: JSON.stringify({ project, content, timestamp })
+                body: JSON.stringify(formData)
             });
 
             if (response.ok) {
-                document.getElementById('newEntryForm').reset();
-                this.displayEntries(await response.json());
+                document.getElementById('entryForm').reset();
+                const data = await response.json();
+                this.displayEntries([data.entry]);
             }
         } catch (error) {
             console.error('Error creating entry:', error);
