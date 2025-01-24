@@ -2,19 +2,21 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-8">
-            <div class="card">
-                <div class="card-body">
-                    <h2 class="entry-title mb-3"></h2>
-                    <h6 class="entry-metadata mb-4 text-muted"></h6>
-                    <div class="entry-content"></div>
-                </div>
-            </div>
+    <div class="card">
+        <div class="card-body">
+            <h1 class="entry-title"></h1>
+            <p class="entry-metadata text-muted"></p>
+            <div class="entry-content"></div>
+            <hr>
+            <div class="entry-time-worked"></div>
+            <div class="entry-start-time"></div>
+            <div class="entry-end-time"></div>
+            <div class="entry-repository"></div>
         </div>
     </div>
 </div>
 {% endblock %}
+
 
 
 {% block message_box %}

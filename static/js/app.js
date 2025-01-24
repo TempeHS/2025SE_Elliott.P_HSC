@@ -89,9 +89,9 @@ class SearchManager {
     async handleSearch(e) {
         e.preventDefault();
         const params = new URLSearchParams({
-            project: document.getElementById('searchProject').value,
-            developer_tag: document.getElementById('searchDeveloper').value,
-            date: document.getElementById('searchDate').value
+            project: document.getElementById('projectSearch').value,
+            developer_tag: document.getElementById('developerSearch').value,
+            date: document.getElementById('dateSearch').value
         });
 
         try {
@@ -115,6 +115,7 @@ class SearchManager {
         this.resultsContainer.innerHTML = entries.map(entry => createEntryCard(entry)).join('');
     }
 }
+
 
 class HomeManager {
     constructor() {
@@ -180,12 +181,16 @@ class EntryViewer {
         const elements = {
             '.entry-title': entry.project,
             '.entry-metadata': `${new Date(entry.timestamp).toLocaleString()} - ${entry.developer_tag}`,
-            '.entry-content': entry.content
+            '.entry-content': entry.content,
+            '.entry-time-worked': `Time worked: ${entry.time_worked} minutes`,
+            '.entry-start-time': `Start: ${new Date(entry.start_time).toLocaleString()}`,
+            '.entry-end-time': `End: ${new Date(entry.end_time).toLocaleString()}`,
+            '.entry-repository': entry.repository_url ? `Repository: <a href="${escapeHtml(entry.repository_url)}" target="_blank">${escapeHtml(entry.repository_url)}</a>` : ''
         };
 
         Object.entries(elements).forEach(([selector, value]) => {
             const element = document.querySelector(selector);
-            if (element) element.textContent = value;
+            if (element) element.innerHTML = value;
         });
     }
 }
@@ -220,14 +225,17 @@ function createEntryCard(entry) {
                 <p class="card-text">${escapeHtml(clipContent(entry.content))}</p>
                 <div class="entry-details">
                     <small class="text-muted">
-                        time worked: ${entry.time_worked} minutes
-                        ${entry.repository_url ? `<br><a href="${escapeHtml(entry.repository_url)}" target="_blank">repository</a>` : ''}
+                        <div>time worked: ${entry.time_worked} minutes</div>
+                        <div>start: ${new Date(entry.start_time).toLocaleString()}</div>
+                        <div>end: ${new Date(entry.end_time).toLocaleString()}</div>
+                        ${entry.repository_url ? `<div><a href="${escapeHtml(entry.repository_url)}" target="_blank">repository</a></div>` : ''}
                     </small>
                 </div>
             </div>
         </div>
     `;
 }
+
 
 // initialize all managers on dom load
 document.addEventListener('DOMContentLoaded', () => {
