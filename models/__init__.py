@@ -10,6 +10,8 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
     developer_tag = db.Column(db.String(50), unique=True, nullable=False)
+    two_fa_enabled = db.Column(db.Boolean, default=False)
+    two_fa_verified = db.Column(db.Boolean, default=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -27,6 +29,8 @@ class LogEntry(db.Model):
     time_worked = db.Column(db.Integer)  # Store minutes
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     developer_tag = db.Column(db.String(50), db.ForeignKey('user.developer_tag'), nullable=False)
+    two_fa_enabled = db.Column(db.Boolean, default=False)
+    two_fa_verified = db.Column(db.Boolean, default=False)
 
     def to_dict(self):
         return {

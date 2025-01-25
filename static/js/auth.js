@@ -6,16 +6,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            console.log('Login form submitted');
             
             const formData = {
                 email: document.getElementById('email').value,
                 password: document.getElementById('password').value
             };
-            console.log('Form data prepared:', formData);
 
             try {
-                console.log('Sending login request...');
                 const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: {
@@ -24,25 +21,54 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     body: JSON.stringify(formData)
                 });
-                console.log('Response received:', response);
 
                 const data = await response.json();
-                console.log('Response data:', data);
                 
                 if (response.ok) {
-                    window.location.href = data.redirect;
+                    if (data.require_2fa) {
+                        // Show 2FA verification input
+                        document.getElementById('loginForm').style.display = 'none';
+                        document.getElementById('twoFactorForm').style.display = 'block';
+                    } else {
+                        window.location.href = data.redirect || '/';
+                    }
                 } else {
                     throw new Error(data.error);
                 }
             } catch (error) {
-                console.error('Login error:', error);
                 const errorDiv = document.getElementById('loginError');
-                if (errorDiv) {
+                errorDiv.textContent = error.message;
+                errorDiv.style.display = 'block';
+            }
+        });
+
+        // 2FA Verification Handler
+        const verifyLoginBtn = document.getElementById('verifyLoginCode');
+        if (verifyLoginBtn) {
+            verifyLoginBtn.addEventListener('click', async () => {
+                const code = document.getElementById('verificationCode').value;
+                try {
+                    const response = await fetch('/api/auth/verify-login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({ code })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        window.location.href = data.redirect;
+                    } else {
+                        throw new Error(data.error);
+                    }
+                } catch (error) {
+                    const errorDiv = document.getElementById('loginError');
                     errorDiv.textContent = error.message;
                     errorDiv.style.display = 'block';
                 }
-            }
-        });
+            });
+        }
     }
 
     if (signupForm) {

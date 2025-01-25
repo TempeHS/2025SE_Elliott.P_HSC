@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="profile-content">
+        <div class="row">
+            <!-- Profile Card -->
+            <div class="col-md-4">
+                <div class="card profile-card">
+                    <div class="card-body text-center">
+                        <img src="{{ url_for('static', filename='images/icons/Android Icons/192x192.png') }}" 
+                             class="rounded-circle profile-image mb-3" 
+                             alt="Profile Picture">
+                        <h3 class="developer-tag mb-2"></h3>
+                        <p class="email-display text-muted"></p>
+                        <button id="logoutBtn" class="btn btn-danger mt-3">logout</button>
+                    </div>
+                </div>
+
+                <!-- 2FA Settings Card -->
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Security Settings</h5>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="twoFAToggle">
+                            <label class="form-check-label" for="twoFAToggle">Enable Email 2FA</label>
+                        </div>
+                        <div id="verificationSection" style="display: none;" class="mt-3">
+                            <input type="text" class="form-control" id="verificationCode" placeholder="Enter verification code">
+                            <button class="btn btn-primary mt-2" id="verifyCode">Verify</button>
+                        </div>
+                        <div id="twoFAOptOut" style="display: none;" class="mt-3">
+                            <p>2FA is enabled but not verified. Would you like to opt out?</p>
+                            <button class="btn btn-warning" id="disableTwoFA">Disable 2FA</button>
+</div>
+
+                    </div>
+                </div>
+
+                <!-- Stats Card -->
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Statistics</h5>
+                        <p class="project-count mb-2"></p>
+                        <p class="entry-count mb-0"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Entries Section -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h4>my entries</h4>
+                        <div id="userEntries" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.profile-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.profile-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border: 3px solid #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.profile-card {
+    position: sticky;
+    top: 20px;
+}
+.card {
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.card-title {
+    color: #333;
+    font-weight: 500;
+}
+</style>
+{% endblock %}

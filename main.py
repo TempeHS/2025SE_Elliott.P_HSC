@@ -6,24 +6,30 @@ import logging
 from models import db, User
 from api import api
 import os
+from config import Config
+from flask_mail import Mail
 
-# Configure logging
+# configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
+app.config.from_object(Config)
 
-# Initialize CSRF protection
+# initialize mail
+mail = Mail(app)
+
+# initialize CSRF protection
 csrf = CSRFProtect()
 csrf.init_app(app)
 
-# Initialize LoginManager
+# initialize LoginManager
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-# Database setup
+# database setup
 basedir = os.path.abspath(os.path.dirname(__file__))
 os.makedirs('.databaseFiles', exist_ok=True)
 db_path = os.path.join(basedir, '.databaseFiles', 'devlog.db')
@@ -96,9 +102,16 @@ def view_entry(entry_id):
         return redirect(url_for('login'))
     return render_template('entry_veiw.html')
 
+@app.route('/profile')
+def profile():
+    if not check_auth():
+        return redirect(url_for('login'))
+    return render_template('profile.html')
+
+
 #HAVE THIS AT THE END!!!!
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=False) 
+    app.run(debug=True) 
     #turn to True for logs

@@ -249,6 +249,98 @@ class PrivacyManager {
     }
 }
 
+class ProfileManager {
+    constructor() {
+        // only run on the profile page (!!!!)
+        if (window.location.pathname === '/profile') {
+            this.loadProfileData();
+            this.bindLogoutEvent();
+            this.bindTwoFAEvents();
+        }
+    }
+
+    async loadProfileData() {
+        try {
+            const response = await fetch('/api/entries/user-stats');
+            const data = await response.json();
+            
+            if (!response.ok) throw new Error(data.error);
+            
+            document.querySelector('.developer-tag').textContent = data.developer_tag;
+            document.querySelector('.email-display').textContent = data.email;
+            
+            // Set 2FA toggle state
+            const twoFAToggle = document.getElementById('twoFAToggle');
+            if (twoFAToggle) {
+                twoFAToggle.checked = data.two_fa_enabled;
+            }
+            
+            const entriesContainer = document.getElementById('userEntries');
+            if (entriesContainer) {
+                entriesContainer.innerHTML = data.entries.map(entry => createEntryCard(entry)).join('');
+            }
+        } catch (error) {
+            showNotification('failed to load profile', 'error');
+        }
+    }
+
+
+    bindLogoutEvent() {
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                try {
+                    const response = await fetch('/api/auth/logout', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    });
+                    if (response.ok) {
+                        window.location.href = '/login';
+                    }
+                } catch (error) {
+                    showNotification('logout failed', 'error');
+                }
+            });
+        }
+    }
+
+    bindTwoFAEvents() {
+        const toggle = document.getElementById('twoFAToggle');
+        toggle.addEventListener('change', async () => {
+            if (toggle.checked) {
+                const response = await fetch('/api/auth/enable-2fa', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+                if (response.ok) {
+                    document.getElementById('verificationSection').style.display = 'block';
+                    showNotification('verification code sent to your email', 'success');
+                }
+            }
+        });
+
+        document.getElementById('verifyCode').addEventListener('click', async () => {
+            const code = document.getElementById('verificationCode').value;
+            const response = await fetch('/api/auth/verify-2fa', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ code })
+            });
+            if (response.ok) {
+                showNotification('2FA enabled successfully', 'success');
+                document.getElementById('verificationSection').style.display = 'none';
+            }
+        });
+    }
+}
+
 // utility functions
 function escapeHtml(unsafe) { // prevents xss in dynamic stuff
     return unsafe
@@ -312,4 +404,5 @@ document.addEventListener('DOMContentLoaded', () => {
     new HomeManager();
     new EntryViewer();
     new PrivacyManager();
+    new ProfileManager();
 });

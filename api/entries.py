@@ -102,25 +102,21 @@ def get_metadata():
 
 @api.route('/entries/user-stats', methods=['GET'])
 def get_user_stats():
-    print("\n=== FETCHING USER STATS ===")
-    
     user = UserManager.get_current_user()
     if not user:
         return jsonify({'error': 'Authentication required'}), 401
 
     try:
-        # Get all entries for the current user
         entries = LogEntry.query.filter_by(developer_tag=user.developer_tag).all()
-        # Get unique projects
         projects = set(entry.project for entry in entries)
-        
-        print(f"Found stats for {user.developer_tag}: {len(projects)} projects, {len(entries)} entries")
         
         return jsonify({
             'developer_tag': user.developer_tag,
+            'email': user.email,
             'project_count': len(projects),
             'entry_count': len(entries),
-            'entries': [entry.to_dict() for entry in entries]
+            'entries': [entry.to_dict() for entry in entries],
+            'two_fa_enabled': user.two_fa_enabled
         })
         
     except Exception as e:
