@@ -71,3 +71,21 @@ def logout():
         return jsonify({'message': 'Logged out successfully', 'redirect': '/login'})
     except Exception as e:
         return jsonify({'error': str(e)}), 400
+
+@api.route('/user/data', methods=['GET'])
+def get_user_data():
+    user = UserManager.get_current_user()
+    if not user:
+        return jsonify({'error': 'Authentication required'}), 401
+        
+    user_data = UserManager.download_user_data(user)
+    return jsonify(user_data)
+
+@api.route('/user/data', methods=['DELETE'])
+def delete_user_data():
+    user = UserManager.get_current_user()
+    if not user:
+        return jsonify({'error': 'Authentication required'}), 401
+        
+    UserManager.delete_user_account(user)
+    return jsonify({'message': 'Account deleted successfully'})

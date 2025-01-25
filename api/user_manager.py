@@ -1,6 +1,6 @@
 from flask import session
 from datetime import datetime, timedelta
-from models import User, db
+from models import User, LogEntry, db
 from .data_manager import DataManager
 
 # user authentication and session management
@@ -59,3 +59,20 @@ class UserManager:
         if not UserManager.check_session():
             return None
         return User.query.get(session['user_id'])
+
+    @staticmethod
+    def download_user_data(user):
+        entries = LogEntry.query.filter_by(developer_tag=user.developer_tag).all()
+        return {
+            'user': {
+                'email': user.email,
+                'developer_tag': user.developer_tag
+            },
+            'entries': [entry.to_dict() for entry in entries]
+        }
+
+    @staticmethod
+    def delete_user_account(user):
+        LogEntry.query.filter_by(developer_tag=user.developer_tag).delete()
+        db.session.delete(user)
+        db.session.commit()

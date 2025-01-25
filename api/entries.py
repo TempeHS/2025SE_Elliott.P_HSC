@@ -28,17 +28,23 @@ def create_entry():
 
     try:
         data = request.get_json()
-        print("Received data:", data)
+        print("received data:", data)
+
+        # validate timestamps first
+        start_time, end_time = DataManager.validate_timestamps(
+            data['start_time'], 
+            data['end_time']
+        )
 
         entry = LogEntry(
             project=DataManager.sanitize_project(data['project']),
             content=DataManager.sanitize_content(data['content']),
             repository_url=DataManager.sanitize_repository_url(data['repository_url']),
-            start_time=datetime.fromisoformat(data['start_time']),
-            end_time=datetime.fromisoformat(data['end_time']),
-            developer_tag=user.developer_tag,
-            timestamp=datetime.utcnow()
+            start_time=start_time,
+            end_time=end_time,
+            developer_tag=user.developer_tag
         )
+
 
         entry.time_worked = calculate_time_worked(entry.start_time, entry.end_time)
         

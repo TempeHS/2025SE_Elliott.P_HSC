@@ -44,7 +44,11 @@ class EntryManager {
 
             const data = await response.json();
             if (response.ok) {
+                // clear form and validation states
                 this.form.reset();
+                this.form.querySelectorAll('input, textarea').forEach(input => {
+                    input.classList.remove('is-valid', 'is-invalid');
+                });
                 showNotification('entry created', 'success');
                 this.loadProjectSuggestions();
             } else {
@@ -195,8 +199,58 @@ class EntryViewer {
     }
 }
 
+class PrivacyManager {
+    constructor() {
+        this.bindPrivacyEvents();
+    }
+
+    bindPrivacyEvents() {
+        const downloadBtn = document.getElementById('downloadData');
+        const deleteBtn = document.getElementById('deleteAccount');
+
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', () => this.handleDownload());
+        }
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', () => this.handleDelete());
+        }
+    }
+
+    async handleDownload() {
+        try {
+            const response = await fetch('/api/user/data');
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'my_devlog_data.json';
+            a.click();
+        } catch (error) {
+            showNotification('failed to download data', 'error');
+        }
+    }
+
+    async handleDelete() {
+        if (confirm('are you sure? this action cannot be undone')) {
+            try {
+                const response = await fetch('/api/user/data', {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+                if (response.ok) {
+                    window.location.href = '/login';
+                }
+            } catch (error) {
+                showNotification('failed to delete account', 'error');
+            }
+        }
+    }
+}
+
 // utility functions
-function escapeHtml(unsafe) {
+function escapeHtml(unsafe) { // prevents xss in dynamic stuff
     return unsafe
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -206,7 +260,21 @@ function escapeHtml(unsafe) {
 }
 
 function showNotification(message, type) {
-    console.log(`${type}: ${message}`);
+    // create alert div
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+    alert.role = 'alert';
+    alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+
+    // insert at top of page
+    const container = document.querySelector('.container');
+    container.insertBefore(alert, container.firstChild);
+
+    // auto remove after 5 seconds
+    setTimeout(() => alert.remove(), 5000);
 }
 
 function clipContent(content, maxLines = 3) {
@@ -243,4 +311,5 @@ document.addEventListener('DOMContentLoaded', () => {
     new SearchManager();
     new HomeManager();
     new EntryViewer();
+    new PrivacyManager();
 });

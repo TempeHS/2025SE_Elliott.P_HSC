@@ -8,26 +8,27 @@ class DataManager:
     
     @staticmethod
     def sanitize_repository_url(url):
+        #prevents xss 
         if not url:
             return None
         url = url.strip()
-        # Simple URL pattern check
+        # url pattern check, no legit validator
         url_pattern = r'^https?:\/\/(github\.com|gitlab\.com|bitbucket\.org)\/[\w\-\.\/]+$'
         if not re.match(url_pattern, url):
             raise ValueError("URL must be a valid repository URL")
         return url
 
-    
+    # exception handling for bad times
     @staticmethod
     def validate_timestamps(start_time, end_time):
         try:
             start = datetime.fromisoformat(start_time)
             end = datetime.fromisoformat(end_time)
             if end <= start:
-                raise ValueError("End time must be after start time")
+                raise ValueError("end time must be after start time")
             return start, end
         except ValueError as e:
-            raise ValueError(f"Invalid timestamp format: {str(e)}")
+            raise ValueError(f"invalid timestamp format: {str(e)}")
 
     @staticmethod
     def calculate_time_worked(start_time, end_time):
@@ -41,7 +42,7 @@ class DataManager:
     @staticmethod
     def sanitize_developer_tag(developer_tag):
         return developer_tag.strip().lower()
-        
+    # sanitize and validate project name
     @staticmethod
     def sanitize_project(project):
         if not project or not isinstance(project, str):
@@ -52,7 +53,7 @@ class DataManager:
         if not re.match(r'^[a-zA-Z0-9][a-zA-Z0-9\s_-]*$', project):
             raise ValueError("Project name must start with alphanumeric and contain only letters, numbers, spaces, underscores, or hyphens")
         return project[:100]
-
+    # exception handling for bad content
     @staticmethod
     def sanitize_content(content):
         if not content or not isinstance(content, str):
@@ -78,6 +79,4 @@ class DataManager:
         return clean_params
 
 
-    #<sanitize stuff ------!>
-
-        # <should probably include some validation exception handling here
+    #<sanitize stuff end ------!>
