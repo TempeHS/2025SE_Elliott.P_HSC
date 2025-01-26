@@ -123,43 +123,76 @@ class SearchManager {
 
 class HomeManager {
     constructor() {
-        this.loadUserStats();
+        this.loadProjectData();
     }
 
-    async loadUserStats() {
+    async loadProjectData() {
         try {
             const response = await fetch('/api/entries/user-stats');
             const data = await response.json();
             
             if (!response.ok) throw new Error(data.error);
             
-            this.updateStats(data);
-            this.displayUserEntries(data.entries);
+            // group entries by project
+            const projectGroups = this.groupEntriesByProject(data.entries);
+            this.displayProjectCards(projectGroups);
         } catch (error) {
-            console.error('stats load failed:', error);
+            showNotification('Failed to load projects', 'error');
         }
     }
 
-    updateStats(data) {
-        const elements = {
-            '.developer-tag': data.developer_tag,
-            '.project-count': `${data.project_count} projects`,
-            '.entry-count': `${data.entry_count} entries`
-        };
+    groupEntriesByProject(entries) {
+        return entries.reduce((groups, entry) => {
+            if (!groups[entry.project]) {
+                groups[entry.project] = [];
+            }
+            groups[entry.project].push(entry);
+            return groups;
+        }, {});
+    }
 
-        Object.entries(elements).forEach(([selector, value]) => {
-            const element = document.querySelector(selector);
-            if (element) element.textContent = value;
+    displayProjectCards(projectGroups) {
+        const container = document.getElementById('projectCards');
+        if (!container) return;
+
+        container.innerHTML = Object.entries(projectGroups).map(([project, entries]) => `
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card project-card">
+                    <div class="card-body">
+                        <h5 class="card-title">${escapeHtml(project)}</h5>
+                        <div class="project-entries collapsed">
+                            ${entries.slice(0, 3).map(entry => this.createEntryPreview(entry)).join('')}
+                        </div>
+                        ${entries.length > 3 ? `
+                            <button class="btn btn-outline-primary expand-button" 
+                                    onclick="event.stopPropagation(); this.closest('.project-card').querySelector('.project-entries').classList.toggle('collapsed')">
+                                Show ${entries.length - 3} more entries
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        // click handlers
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.addEventListener('click', () => {
+                card.querySelector('.project-entries').classList.toggle('collapsed');
+            });
         });
     }
 
-    displayUserEntries(entries) {
-        const container = document.getElementById('userEntries');
-        if (container) {
-            container.innerHTML = entries.map(entry => createEntryCard(entry)).join('');
-        }
+    createEntryPreview(entry) {
+        return `
+            <div class="entry-preview mb-3">
+                <small class="text-muted">${new Date(entry.timestamp).toLocaleDateString()}</small>
+                <p class="mb-1">${escapeHtml(clipContent(entry.content, 2))}</p>
+                <a href="/entry/${entry.id}" class="stretched-link"></a>
+            </div>
+        `;
     }
 }
+
 
 class EntryViewer {
     constructor() {
@@ -319,6 +352,17 @@ class ProfileManager {
                 if (response.ok) {
                     document.getElementById('verificationSection').style.display = 'block';
                     showNotification('verification code sent to your email', 'success');
+                }
+            } else {
+                const response = await fetch('/api/auth/disable-2fa', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+                if (response.ok) {
+                    document.getElementById('verificationSection').style.display = 'none';
+                    showNotification('2FA disabled successfully', 'success');
                 }
             }
         });
