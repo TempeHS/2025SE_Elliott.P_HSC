@@ -37,7 +37,12 @@ class DataManager:
 
     @staticmethod
     def sanitize_email(email):
-        return email.strip().lower()
+        if not email or not isinstance(email, str):
+            raise ValueError("Invalid email format")
+        email = email.strip().lower()
+        if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+            raise ValueError("Invalid email format")
+        return email
 
     @staticmethod
     def sanitize_developer_tag(developer_tag):
@@ -59,7 +64,7 @@ class DataManager:
         if not content or not isinstance(content, str):
             raise ValueError("Content cannot be empty")
         content = content.strip()
-        if len(content) > 1000:  # Adding reasonable content limit
+        if len(content) > 10000:  # reasonable content limit
             raise ValueError("Content exceeds maximum length of 1000 characters")
         return content
 

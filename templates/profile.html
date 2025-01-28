@@ -4,8 +4,8 @@
 <div class="container mt-5">
     <div class="profile-content">
         <div class="row">
-            <!-- Profile Card -->
-            <div class="col-md-4">
+            <!-- profile column - sticky -->
+            <div class="col-md-4 sticky-column">
                 <div class="card profile-card">
                     <div class="card-body text-center">
                         <img src="{{ url_for('static', filename='images/icons/Android Icons/192x192.png') }}" 
@@ -17,7 +17,7 @@
                     </div>
                 </div>
 
-                <!-- 2FA Settings Card -->
+                <!-- 2FA  -->
                 <div class="card mt-3">
                     <div class="card-body">
                         <h5 class="card-title">Security Settings</h5>
@@ -29,15 +29,10 @@
                             <input type="text" class="form-control" id="verificationCode" placeholder="Enter verification code">
                             <button class="btn btn-primary mt-2" id="verifyCode">Verify</button>
                         </div>
-                        <div id="twoFAOptOut" style="display: none;" class="mt-3">
-                            <p>2FA is enabled but not verified. Would you like to opt out?</p>
-                            <button class="btn btn-warning" id="disableTwoFA">Disable 2FA</button>
-</div>
-
                     </div>
                 </div>
 
-                <!-- Stats Card -->
+                <!-- stats  -->
                 <div class="card mt-3">
                     <div class="card-body">
                         <h5 class="card-title">Statistics</h5>
@@ -47,7 +42,7 @@
                 </div>
             </div>
             
-            <!-- Entries Section -->
+            <!-- entries -->
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-body">
@@ -59,30 +54,4 @@
         </div>
     </div>
 </div>
-
-<style>
-.profile-content {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-.profile-image {
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
-    border: 3px solid #f8f9fa;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-.profile-card {
-    position: sticky;
-    top: 20px;
-}
-.card {
-    border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-.card-title {
-    color: #333;
-    font-weight: 500;
-}
-</style>
 {% endblock %}

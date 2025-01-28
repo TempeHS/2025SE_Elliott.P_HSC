@@ -120,6 +120,7 @@ def get_user_stats():
         })
         
     except Exception as e:
+        logger.error(f"Error fetching user stats: {str(e)}")
         print(f"ERROR fetching user stats: {str(e)}")
         return jsonify({'error': str(e)}), 500
 

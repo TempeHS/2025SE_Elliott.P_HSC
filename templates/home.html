@@ -1,99 +1,54 @@
 {% extends "base.html" %}
 
+{% block title %}Home(r)_Log{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body text-center">
-                    <h3 class="developer-tag mb-2"></h3>
-                    <p class="project-count mb-1"></p>
-                    <p class="entry-count mb-0"></p>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="message-box mb-4">
+                <p class="mono-text">home() :: your_project_dashboard</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Quick Stats</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-yellow">Total Projects</div>
+                            <div class="stat-value" id="projectCount">-</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-yellow">Total Entries</div>
+                            <div class="stat-value" id="entryCount">-</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-yellow">Developer Tag</div>
+                            <div class="stat-value" id="devTag">-</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!--projects section -->
     <div class="row">
         <div class="col-12">
-            <h2 class="mb-4">My Projects</h2>
+            <h4 class="mb-4">Recent Activity</h4>
+            <div id="projectCards" class="row">
+                <!-- Project cards with consistent entry preview styling will be inserted here -->
+            </div>
         </div>
     </div>
-    
-    <div id="projectCards" class="row g-4">
-        <!-- project cards here -->
-    </div>
-</div>
 
-<style>
-.project-card {
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    border-radius: 12px;
-}
-
-.project-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-.project-entries.collapsed {
-    max-height: 400px;
-    overflow: hidden;
-    position: relative;
-}
-
-.project-entries.collapsed::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 50px;
-    background: linear-gradient(transparent, white);
-}
-
-.expand-button {
-    width: 100%;
-    margin-top: 10px;
-    border-radius: 8px;
-    transition: all 0.2s;
-}
-
-.entry-preview {
-    padding: 10px;
-    border-radius: 8px;
-    background: #f8f9fa;
-    margin-bottom: 10px;
-    position: relative;
-}
-
-.entry-preview:hover {
-    background: #e9ecef;
-}
-
-.card {
-    border: none;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-.developer-tag {
-    color: #2c3e50;
-    font-weight: 600;
-}
-
-.project-count, .entry-count {
-    color: #6c757d;
-    font-size: 1.1rem;
-}
-</style>
-{% endblock %}
-
-{% block message_box %}
-<div class="container mt-4">
-    <div class="message-box">
-        <p class="mono-text">home :: view_your_projects</p>
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <a href="{{ url_for('index') }}" class="btn btn-primary">Create New Entry</a>
+        </div>
     </div>
 </div>
 {% endblock %}

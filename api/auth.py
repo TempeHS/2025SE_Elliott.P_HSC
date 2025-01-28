@@ -8,37 +8,62 @@ from .user_manager import UserManager
 import random
 import string
 from flask_mail import Mail, Message
-mail = Mail()
+import logging
+
+# Configure logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 #when get POST request, check credentials and handle errors
 @api.route('/auth/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    user = UserManager.authenticate(data['email'], data['password'])
+    logger.info("Login attempt received")
     
-    if user:
-        if user.two_fa_enabled:
-            code = generate_verification_code()
-            session['temp_user_id'] = user.id
-            session['verification_code'] = code
-            
-            msg = Message('Login Verification Code',
-                          sender='noreply@devlog.com',
-                          recipients=[user.email])
-            msg.body = f'Your login verification code is: {code}'
-            mail.send(msg)
-            
-            return jsonify({
-                'require_2fa': True,
-                'message': 'Please enter verification code'
-            })
-            
-        login_user(user)
-        session['user_id'] = user.id
-        session['last_active'] = datetime.utcnow().isoformat()
-        return jsonify({'redirect': '/'})
+    if not request.is_json:
+        logger.warning("Invalid content type in login request")
+        return jsonify({'error': 'Invalid content type'}), 400
         
-    return jsonify({'error': 'Invalid credentials'}), 401
+    data = request.get_json()
+    if not all(k in data for k in ['email', 'password']):
+        logger.warning("Missing credentials in login request")
+        return jsonify({'error': 'Missing credentials'}), 400
+
+    try:
+        user = UserManager.authenticate(data['email'], data['password'])
+        
+        if user:
+            if user.two_fa_enabled:
+                code = generate_verification_code()
+                session['temp_user_id'] = user.id
+                session['verification_code'] = code
+                
+                msg = Message('Login Verification Code',
+                              sender='noreply@devlog.com',
+                              recipients=[user.email])
+                msg.body = f'Your verification code is: {code}'
+                mail.send(msg)
+                
+                logger.info(f"2FA code sent to user: {user.email}")
+                return jsonify({
+                    'require_2fa': True,
+                    'message': 'Please enter verification code'
+                })
+                
+            login_user(user)
+            session['user_id'] = user.id
+            session['last_active'] = datetime.utcnow().isoformat()
+            logger.info(f"User logged in successfully: {user.email}")
+            return jsonify({'redirect': '/'})
+            
+        logger.warning(f"Failed login attempt for email: {data['email']}")
+        return jsonify({'error': 'Invalid credentials'}), 401
+        
+    except Exception as e:
+        logger.error(f"Login error: {str(e)}")
+        return jsonify({'error': 'Login failed'}), 500
+
+def generate_verification_code():
+    return ''.join(random.choices(string.digits, k=6))
 
 
 #when get POST request, validate data and create new user

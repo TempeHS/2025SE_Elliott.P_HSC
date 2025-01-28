@@ -1,9 +1,13 @@
 from dotenv import load_dotenv
 import os
+from datetime import timedelta
 
 load_dotenv()
 
 class Config:
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    PERMANENT_SESSION_LIFETIME = timedelta(hours=1)
     # security config
     SECRET_KEY = os.getenv('SECRET_KEY', os.urandom(24)) #random session key
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///.databaseFiles/devlog.db')

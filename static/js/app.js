@@ -133,7 +133,12 @@ class HomeManager {
             
             if (!response.ok) throw new Error(data.error);
             
-            // group entries by project
+            // Update stats display
+            document.getElementById('projectCount').textContent = data.project_count;
+            document.getElementById('entryCount').textContent = data.entry_count;
+            document.getElementById('devTag').textContent = data.developer_tag;
+            
+            // Group entries by project
             const projectGroups = this.groupEntriesByProject(data.entries);
             this.displayProjectCards(projectGroups);
         } catch (error) {
@@ -157,36 +162,29 @@ class HomeManager {
 
         container.innerHTML = Object.entries(projectGroups).map(([project, entries]) => `
             <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card project-card">
+                <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">${escapeHtml(project)}</h5>
-                        <div class="project-entries collapsed">
+                        <div class="project-entries">
                             ${entries.slice(0, 3).map(entry => this.createEntryPreview(entry)).join('')}
+                            ${entries.length > 3 ? `
+                                <button class="btn btn-outline-primary mt-2" 
+                                        onclick="event.stopPropagation(); this.closest('.project-entries').classList.toggle('collapsed')">
+                                    Show ${entries.length - 3} more entries
+                                </button>
+                            ` : ''}
                         </div>
-                        ${entries.length > 3 ? `
-                            <button class="btn btn-outline-primary expand-button" 
-                                    onclick="event.stopPropagation(); this.closest('.project-card').querySelector('.project-entries').classList.toggle('collapsed')">
-                                Show ${entries.length - 3} more entries
-                            </button>
-                        ` : ''}
                     </div>
                 </div>
             </div>
         `).join('');
-
-        // click handlers
-        document.querySelectorAll('.project-card').forEach(card => {
-            card.addEventListener('click', () => {
-                card.querySelector('.project-entries').classList.toggle('collapsed');
-            });
-        });
     }
 
     createEntryPreview(entry) {
         return `
             <div class="entry-preview mb-3">
-                <small class="text-muted">${new Date(entry.timestamp).toLocaleDateString()}</small>
-                <p class="mb-1">${escapeHtml(clipContent(entry.content, 2))}</p>
+                <small>${new Date(entry.timestamp).toLocaleDateString()}</small>
+                <p class="mb-1">${escapeHtml(clipContent(entry.content, 10))}</p>
                 <a href="/entry/${entry.id}" class="stretched-link"></a>
             </div>
         `;
@@ -284,7 +282,7 @@ class PrivacyManager {
 
 class ProfileManager {
     constructor() {
-        // only run on the profile page (!!!!)
+        // only run on the profile page
         if (window.location.pathname === '/profile') {
             this.loadProfileData();
             this.bindLogoutEvent();
@@ -316,7 +314,6 @@ class ProfileManager {
             showNotification('failed to load profile', 'error');
         }
     }
-
 
     bindLogoutEvent() {
         const logoutBtn = document.getElementById('logoutBtn');
@@ -420,15 +417,15 @@ function clipContent(content, maxLines = 3) {
 
 function createEntryCard(entry) {
     return `
-        <div class="card mb-3 entry-card" onclick="window.location.href='/entry/${entry.id}'">
+        <div class="card mb-3 entry-card">
             <div class="card-body">
                 <h5 class="card-title text-truncate">${escapeHtml(entry.project)}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">
+                <h6 class="card-subtitle mb-2">
                     ${new Date(entry.timestamp).toLocaleString()} - ${escapeHtml(entry.developer_tag)}
                 </h6>
                 <p class="card-text">${escapeHtml(clipContent(entry.content))}</p>
                 <div class="entry-details">
-                    <small class="text-muted">
+                    <small>
                         <div>time worked: ${entry.time_worked} minutes</div>
                         <div>start: ${new Date(entry.start_time).toLocaleString()}</div>
                         <div>end: ${new Date(entry.end_time).toLocaleString()}</div>
@@ -441,12 +438,27 @@ function createEntryCard(entry) {
 }
 
 
+
+
 // initialize all managers on dom load
 document.addEventListener('DOMContentLoaded', () => {
-    new EntryManager();
-    new SearchManager();
-    new HomeManager();
-    new EntryViewer();
-    new PrivacyManager();
-    new ProfileManager();
+    // Only initialize managers if their respective elements exist
+    if (document.getElementById('entryForm')) {
+        new EntryManager();
+    }
+    if (document.getElementById('searchForm')) {
+        new SearchManager();
+    }
+    if (window.location.pathname === '/home') {
+        new HomeManager();
+    }
+    if (window.location.pathname.startsWith('/entry/')) {
+        new EntryViewer();
+    }
+    if (window.location.pathname === '/privacy') {
+        new PrivacyManager();
+    }
+    if (window.location.pathname === '/profile') {
+        new ProfileManager();
+    }
 });
