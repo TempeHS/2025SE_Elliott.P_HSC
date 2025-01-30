@@ -137,6 +137,28 @@ h1, h2, h3, h4, h5, h6,
     background: linear-gradient(transparent, var(--card-bg));
 }
 
+.sort-controls {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+}
+
+.sort-controls:focus {
+    background-color: #404040;
+    color: var(--text-light);
+    border-color: var(--hover-orange);
+}
+
+.entry-preview {
+    transition: transform 0.2s;
+}
+
+.entry-preview:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+
 /* project entries */
 .project-entries .entry-preview {
     color: var(--text-light);

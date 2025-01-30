@@ -81,45 +81,122 @@ class SearchManager {
     constructor() {
         this.form = document.getElementById('searchForm');
         this.resultsContainer = document.getElementById('searchResults');
-        this.bindSearchEvents();
+        this.bindEvents();
+        this.loadMetadata();
+        this.debounceTimer = null;
     }
 
-    bindSearchEvents() {
-        if (this.form) {
-            this.form.addEventListener('submit', (e) => this.handleSearch(e));
-        }
+    async loadMetadata() {
+        const response = await fetch('/api/entries/metadata');
+        const data = await response.json();
+        this.populateDatalist('projectList', data.projects);
+        this.populateDatalist('developerList', data.developers);
     }
 
-    async handleSearch(e) {
-        e.preventDefault();
-        const params = new URLSearchParams({
-            project: document.getElementById('projectSearch').value,
-            developer_tag: document.getElementById('developerSearch').value,
-            date: document.getElementById('dateSearch').value
+    populateDatalist(id, items) {
+        const datalist = document.getElementById(id);
+        datalist.innerHTML = items.map(item => `<option value="${item}">`).join('');
+    }
+
+    bindEvents() {
+        const filterElements = [
+            'projectSearch',
+            'developerSearch',
+            'dateSearch',
+            'sortField',
+            'sortOrder'
+        ];
+
+        filterElements.forEach(elementId => {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.addEventListener('change', () => this.handleSearch());
+                if (['projectSearch', 'developerSearch'].includes(elementId)) {
+                    element.addEventListener('input', () => this.debounceSearch());
+                }
+            }
+        });
+    }
+
+    debounceSearch() {
+        clearTimeout(this.debounceTimer);
+        this.debounceTimer = setTimeout(() => this.handleSearch(), 300);
+    }
+
+    async handleSearch() {
+        const params = new URLSearchParams();
+        
+        const filters = {
+            project: document.getElementById('projectSearch')?.value,
+            developer_tag: document.getElementById('developerSearch')?.value,
+            date: document.getElementById('dateSearch')?.value,
+            sort_field: document.getElementById('sortField')?.value,
+            sort_order: document.getElementById('sortOrder')?.value
+        };
+
+        Object.entries(filters).forEach(([key, value]) => {
+            if (value) params.append(key, value);
         });
 
         try {
             const response = await fetch(`/api/entries/search?${params}`);
-            const data = await response.json();
-            if (response.ok) {
-                this.displayResults(data);
-            } else {
-                throw new Error(data.error);
-            }
+            if (!response.ok) throw new Error('Search failed');
+            
+            const entries = await response.json();
+            this.displayResults(entries);
         } catch (error) {
-            showNotification(error.message, 'error');
+            this.showError('Failed to fetch search results');
         }
     }
 
     displayResults(entries) {
-        if (!entries.length) {
-            this.resultsContainer.innerHTML = '<div class="alert alert-info">no entries found</div>';
+        if (!this.resultsContainer) return;
+
+        if (entries.length === 0) {
+            this.resultsContainer.innerHTML = `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <p class="text-center">No entries found</p>
+                    </div>
+                </div>`;
             return;
         }
-        this.resultsContainer.innerHTML = entries.map(entry => createEntryCard(entry)).join('');
+
+        this.resultsContainer.innerHTML = entries.map(entry => `
+            <div class="card mb-3 entry-preview">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h5 class="card-title project-name">${entry.project}</h5>
+                        <small class="text-muted">${new Date(entry.timestamp).toLocaleString()}</small>
+                    </div>
+                    <h6 class="card-subtitle mb-2 developer-tag">${entry.developer_tag}</h6>
+                    <p class="card-text">${entry.content}</p>
+                    ${entry.repository_url ? `
+                        <a href="${entry.repository_url}" target="_blank" class="btn btn-sm btn-primary">
+                            View Repository
+                        </a>
+                    ` : ''}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    showError(message) {
+        if (this.resultsContainer) {
+            this.resultsContainer.innerHTML = `
+                <div class="alert alert-danger">
+                    ${message}
+                </div>`;
+        }
     }
 }
 
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('searchForm')) {
+        new SearchManager();
+    }
+});
 
 class HomeManager {
     constructor() {
