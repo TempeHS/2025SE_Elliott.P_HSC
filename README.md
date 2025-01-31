@@ -57,7 +57,7 @@ the mail password is a app password generated from google account settings
 
 ## API Usage Example
 1. Create User 1:
-  ```bash
+```bash
   curl -X POST http://localhost:5000/api/auth/signup \
     -H "Content-Type: application/json" \
     -d '{
@@ -65,10 +65,10 @@ the mail password is a app password generated from google account settings
       "password": "SecurePass123!",
       "developer_tag": "Frontend"
     }'
-  ```bash
+```
 
 2. Create User 2:
-  ```bash
+```bash
   curl -X POST http://localhost:5000/api/auth/signup \
     -H "Content-Type: application/json" \
     -d '{
@@ -76,7 +76,7 @@ the mail password is a app password generated from google account settings
       "password": "TestPass456!",
       "developer_tag": "Backend"
     }'
-    ```bash
+```
 
 3. generate entries, FILL IN API KEY:
   ```bash
@@ -90,7 +90,8 @@ the mail password is a app password generated from google account settings
       "start_time": "2024-01-31T10:00:00",
       "end_time": "2024-01-31T11:00:00"
     }'
-    ```bash
+    ```
+
 User Acceptance Testing Guide
 1. Create Test Users
 
