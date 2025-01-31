@@ -1,5 +1,5 @@
 from flask import jsonify, request, session
-from flask_login import login_user, logout_user
+from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime
 from models import db, User
 from . import api
@@ -186,3 +186,26 @@ def verify_login():
             session.pop('temp_user_id', None)
             return jsonify({'redirect': '/'})
     return jsonify({'error': 'Invalid verification code'}), 401
+
+# API endpoint auth!
+
+@api.route('/user/generate-key', methods=['POST'])
+@login_required
+def generate_api_key():
+    try:
+        key = current_user.generate_api_key()
+        db.session.commit()
+        return jsonify({'message': 'API key generated', 'key': key})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@api.route('/auth/api-key', methods=['POST'])
+def api_authenticate():
+    api_key = request.headers.get('X-API-Key')
+    if not api_key:
+        return jsonify({'error': 'No API key provided'}), 401
+    user = User.query.filter_by(api_key=api_key, api_enabled=True).first()
+    if not user:
+        return jsonify({'error': 'Invalid API key'}), 401
+    return jsonify({'authenticated': True})

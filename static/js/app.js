@@ -359,89 +359,66 @@ class PrivacyManager {
 
 class ProfileManager {
     constructor() {
-        // only run on the profile page
-        if (window.location.pathname === '/profile') {
-            this.loadProfileData();
-            this.bindLogoutEvent();
-            this.bindTwoFAEvents();
-        }
+        this.bindApiKeyEvents();
+        this.loadProfileData();
+        this.bind2FAEvents();
     }
 
-    async loadProfileData() {
-        try {
-            const response = await fetch('/api/entries/user-stats');
-            const data = await response.json();
-            
-            if (!response.ok) throw new Error(data.error);
-            
-            document.querySelector('.developer-tag').textContent = data.developer_tag;
-            document.querySelector('.email-display').textContent = data.email;
-            
-            // Set 2FA toggle state
-            const twoFAToggle = document.getElementById('twoFAToggle');
-            if (twoFAToggle) {
-                twoFAToggle.checked = data.two_fa_enabled;
-            }
-            
-            const entriesContainer = document.getElementById('userEntries');
-            if (entriesContainer) {
-                entriesContainer.innerHTML = data.entries.map(entry => createEntryCard(entry)).join('');
-            }
-        } catch (error) {
-            showNotification('failed to load profile', 'error');
-        }
+    initializeErrorHandling() {
+        this.errorContainer = document.createElement('div');
+        this.errorContainer.className = 'alert alert-danger';
+        document.querySelector('.container').prepend(this.errorContainer);
     }
 
-    bindLogoutEvent() {
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', async () => {
-                try {
-                    const response = await fetch('/api/auth/logout', {
+    showNotification(message, type = 'danger') {
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type} fade show`;
+        notification.textContent = message;
+        document.querySelector('.container').prepend(notification);
+        setTimeout(() => notification.remove(), 3000);
+    }
+
+    logError(error, context) {
+        console.error(`Error in ${context}:`, error);
+        this.showNotification(`${context}: ${error.message}`);
+    }
+
+    bindApiKeyEvents() {
+        document.getElementById('generateApiKey')?.addEventListener('click', () => this.handleGenerateKey());
+        document.getElementById('regenerateApiKey')?.addEventListener('click', () => this.handleRegenerateKey());
+    }
+
+    bind2FAEvents() {
+        const toggle = document.getElementById('twoFactorToggle');
+        if (toggle) {
+            toggle.addEventListener('change', async (e) => {
+                if (e.target.checked) {
+                    const response = await fetch('/api/auth/enable-2fa', {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                         }
                     });
                     if (response.ok) {
-                        window.location.href = '/login';
+                        document.getElementById('verificationSection').style.display = 'block';
+                        this.showNotification('Verification code sent to your email', 'success');
                     }
-                } catch (error) {
-                    showNotification('logout failed', 'error');
+                } else {
+                    const response = await fetch('/api/auth/disable-2fa', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    });
+                    if (response.ok) {
+                        document.getElementById('verificationSection').style.display = 'none';
+                        this.showNotification('2FA disabled successfully', 'success');
+                    }
                 }
             });
         }
-    }
 
-    bindTwoFAEvents() {
-        const toggle = document.getElementById('twoFAToggle');
-        toggle.addEventListener('change', async () => {
-            if (toggle.checked) {
-                const response = await fetch('/api/auth/enable-2fa', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    }
-                });
-                if (response.ok) {
-                    document.getElementById('verificationSection').style.display = 'block';
-                    showNotification('verification code sent to your email', 'success');
-                }
-            } else {
-                const response = await fetch('/api/auth/disable-2fa', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    }
-                });
-                if (response.ok) {
-                    document.getElementById('verificationSection').style.display = 'none';
-                    showNotification('2FA disabled successfully', 'success');
-                }
-            }
-        });
-
-        document.getElementById('verifyCode').addEventListener('click', async () => {
+        document.getElementById('verifyCode')?.addEventListener('click', async () => {
             const code = document.getElementById('verificationCode').value;
             const response = await fetch('/api/auth/verify-2fa', {
                 method: 'POST',
@@ -452,10 +429,82 @@ class ProfileManager {
                 body: JSON.stringify({ code })
             });
             if (response.ok) {
-                showNotification('2FA enabled successfully', 'success');
                 document.getElementById('verificationSection').style.display = 'none';
+                this.showNotification('2FA enabled successfully', 'success');
             }
         });
+    }
+
+    async handleGenerateKey() {
+        try {
+            const response = await fetch('/api/user/generate-key', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+            
+            if (response.ok) {
+                this.showNotification('API key generated successfully', 'success');
+                location.reload();
+            } else {
+                const data = await response.json();
+                throw new Error(data.error || 'Failed to generate API key');
+            }
+        } catch (error) {
+            this.logError(error, 'API Key Generation');
+        }
+    }
+
+    async handleRegenerateKey() {
+        if (confirm('Are you sure? Current API key will be invalidated.')) {
+            await this.handleGenerateKey();
+        }
+    }
+
+    async loadProfileData() {
+        try {
+            const response = await fetch('/api/entries/user-stats');
+            const data = await response.json();
+            
+            const projectCount = document.getElementById('projectCount');
+            const entryCount = document.getElementById('entryCount');
+            
+            if (projectCount) projectCount.textContent = data.project_count;
+            if (entryCount) entryCount.textContent = data.entry_count;
+            
+            this.displayRecentEntries(data.entries);
+            
+        } catch (error) {
+            this.logError(error, 'Profile Data Loading');
+        }
+    }
+
+    displayRecentEntries(entries) {
+        const recentEntries = document.getElementById('recentEntries');
+        if (!recentEntries) return;
+
+        if (!entries?.length) {
+            recentEntries.innerHTML = '<p>No entries yet</p>';
+            return;
+        }
+
+        recentEntries.innerHTML = entries.map(entry => `
+            <div class="card mb-3 entry-preview">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h5 class="card-title project-name">${entry.project}</h5>
+                        <small class="text-muted">${new Date(entry.timestamp).toLocaleString()}</small>
+                    </div>
+                    <p class="card-text">${entry.content}</p>
+                    ${entry.repository_url ? `
+                        <a href="${entry.repository_url}" target="_blank" class="btn btn-sm btn-primary">
+                            View Repository
+                        </a>
+                    ` : ''}
+                </div>
+            </div>
+        `).join('');
     }
 }
 
@@ -536,6 +585,9 @@ document.addEventListener('DOMContentLoaded', () => {
         new PrivacyManager();
     }
     if (window.location.pathname === '/profile') {
+        new ProfileManager();
+    }
+    if (document.getElementById('apiKeySection')) {
         new ProfileManager();
     }
 });

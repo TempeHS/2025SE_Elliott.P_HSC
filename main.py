@@ -45,6 +45,16 @@ app.register_blueprint(api, url_prefix='/api')
 
 print("Available routes:", [str(rule) for rule in app.url_map.iter_rules()])
 
+# more logging
+@app.before_request
+def log_request():
+    logger.info(f"Request: {request.method} {request.path}")
+    if request.is_json and request.get_data():
+        try:
+            logger.info(f"JSON Data: {request.get_json()}")
+        except:
+            pass
+
 def check_auth():
     return 'user_id' in session
 

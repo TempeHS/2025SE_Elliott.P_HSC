@@ -66,6 +66,37 @@ def create_entry():
     finally:
         print("=== ENTRY CREATION ATTEMPT COMPLETE ===\n")
 
+    @require_api_key
+    def create_entry_api():
+        try:
+            data = request.get_json()
+            user = User.query.filter_by(api_key=request.headers.get('X-API-Key')).first()
+            
+            start_time, end_time = DataManager.validate_timestamps(
+                data['start_time'], 
+                data['end_time']
+            )
+
+            entry = LogEntry(
+                project=DataManager.sanitize_project(data['project']),
+                content=DataManager.sanitize_content(data['content']),
+                repository_url=DataManager.sanitize_repository_url(data['repository_url']),
+                start_time=start_time,
+                end_time=end_time,
+                developer_tag=user.developer_tag
+            )
+
+            entry.time_worked = calculate_time_worked(entry.start_time, entry.end_time)
+            
+            db.session.add(entry)
+            db.session.commit()
+            
+            return jsonify(entry.to_dict()), 201
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'error': str(e)}), 400
+
 
 # Get all entries
 @api.route('/entries', methods=['GET'])

@@ -17,16 +17,12 @@ class UserManager:
         user = User.query.filter_by(email=email).first()
         print(f"User found: {user}")
         
-        if user and bcrypt.checkpw(
-            password.encode('utf-8'), 
-            user.password_hash.encode('utf-8')
-        ):
+        if user and bcrypt.checkpw(password.encode('utf-8'), user.password_hash):
             print("Password check passed")
             return user
 
         print("Authentication failed")
         return None
-
 
     @staticmethod
     def create_user(email, password, developer_tag):

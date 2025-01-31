@@ -59,3 +59,9 @@ class Config:
     # cache Configuration
     CACHE_TYPE = "simple"
     CACHE_DEFAULT_TIMEOUT = 300
+
+    # API config
+    API_VERSION = 'v1'
+    API_RATE_LIMIT = "100 per hour"
+    API_KEY_LENGTH = 32
+    API_KEY_PREFIX = "dvlg_"
