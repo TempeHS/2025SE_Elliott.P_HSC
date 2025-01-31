@@ -79,7 +79,7 @@ the mail password is a app password generated from google account settings
 ```
 
 3. generate entries, FILL IN API KEY:
-  ```bash
+```bash
   curl -X POST http://your-api/api/entries \
     -H "X-API-Key: YOUR_API_KEY" \
     -H "Content-Type: application/json" \
@@ -90,7 +90,7 @@ the mail password is a app password generated from google account settings
       "start_time": "2024-01-31T10:00:00",
       "end_time": "2024-01-31T11:00:00"
     }'
-    ```
+```
 
 User Acceptance Testing Guide
 1. Create Test Users
