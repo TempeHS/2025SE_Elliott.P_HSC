@@ -112,7 +112,21 @@ User 2:
     Use your personal email to test 2FA functionality
     Then enable 2fa on the profile page, and check your email (and junk, the email comes from elliottpezzutti@gmail.com) and then log out and sign in to 2FAuthenticate
 
-## 2. Testing Steps
+## 2. Functionality Testing
+
+Sign in with one of the example credintials
+
+Create a new entry with alot of text
+
+then go to your profile page and check that the entry is there, then click on it and it will go to the full veiw
+
+then create another entry with a different project and check that it is there and verify the statistics on the profile page
+
+sign in on another user, and enter a different entry under one of the same project names of the other user, then go back to first user and check the home page to see that the entry matching your project activity is there.
+
+if you ever have any issues PLEASE WRITE THEM DOWN IN A .TXT FILE and COPY AND PASTE THE LOGS / ERROR ALERTS INTO THE FILE.
+
+## 3. Testing Steps
 
 Create entries using the API endpoint
 Test search functionality with different filters
