@@ -56,14 +56,17 @@ the mail password is a app password generated from google account settings
 
 
 ## API Usage Example
+
+
+### It is worth noting that api endpoint is only set up for using the api key to create entries, more can be done, but I think its out of scope, tell me if i should implement any more functionality
 1. Create User 1:
 ```bash
   curl -X POST http://localhost:5000/api/auth/signup \
     -H "Content-Type: application/json" \
     -d '{
       "email": "user1@example.com",
-      "password": "SecurePass123!",
-      "developer_tag": "Frontend"
+      "password": "UserUser!1",
+      "developer_tag": "user1"
     }'
 ```
 
@@ -73,8 +76,8 @@ the mail password is a app password generated from google account settings
     -H "Content-Type: application/json" \
     -d '{
       "email": "user2@example.com",
-      "password": "TestPass456!",
-      "developer_tag": "Backend"
+      "password": "UserUser@2",
+      "developer_tag": "user2"
     }'
 ```
 
@@ -136,3 +139,8 @@ Test validation:
     Try creating entries with end time before start time
     Attempt signup with invalid password formats
     Test input sanitization with special characters
+
+
+curl -X GET "http://localhost:5000/api/entries/search?query=debug" \
+  -H "X-API-Key: your_api_key_here"
+```
