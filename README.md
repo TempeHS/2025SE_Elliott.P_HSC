@@ -34,15 +34,15 @@ Prerequisites:
 - SQLite 3+
 (we have this because of codespace)
 
-1. set up dependancies
+1. set up dependancies:
 
   pip install -r requirements.txt
 
-2. create venv
+2. create venv:
 
   python -m venv venv
 
-3. verify .env file
+3. verify .env file:
 
   SECRET_KEY=your-secure-secret-key-here
   DATABASE_URL=sqlite:///.databaseFiles/devlog.db
@@ -56,7 +56,7 @@ the mail password is a app password generated from google account settings
 
 
 ## API Usage Example
-1. Create User 1
+1. Create User 1:
 
   curl -X POST http://localhost:5000/api/auth/signup \
     -H "Content-Type: application/json" \
@@ -66,7 +66,7 @@ the mail password is a app password generated from google account settings
       "developer_tag": "Frontend"
     }'
 
-2. Create User 2
+2. Create User 2:
 
   curl -X POST http://localhost:5000/api/auth/signup \
     -H "Content-Type: application/json" \
@@ -76,7 +76,7 @@ the mail password is a app password generated from google account settings
       "developer_tag": "Backend"
     }'
 
-3. generate entries, FILL IN API KEY
+3. generate entries, FILL IN API KEY:
 
   curl -X POST http://your-api/api/entries \
     -H "X-API-Key: YOUR_API_KEY" \
@@ -107,15 +107,15 @@ User 2:
 2FA Test:
 
     Use your personal email to test 2FA functionality
-    Then enable 2fa on the profile page, and check your email (and junk, the email comes from newmonkeyooohahhhh@gmail.com) and then log out and sign in to 2FAuthenticate
+    Then enable 2fa on the profile page, and check your email (and junk, the email comes from elliottpezzutti@gmail.com) and then log out and sign in to 2FAuthenticate
 
 ## 2. Testing Steps
 
-    Create entries using the API endpoint
-    Test search functionality with different filters
-    Try sorting entries by date and project
-    View full entry details
-    Test validation:
-        Try creating entries with end time before start time
-        Attempt signup with invalid password formats
-        Test input sanitization with special characters
+Create entries using the API endpoint
+Test search functionality with different filters
+Try sorting entries by date and project
+View full entry details
+Test validation:
+    Try creating entries with end time before start time
+    Attempt signup with invalid password formats
+    Test input sanitization with special characters
