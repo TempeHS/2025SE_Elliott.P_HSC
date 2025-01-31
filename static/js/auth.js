@@ -72,6 +72,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (signupForm) {
+        function validatePassword(password) {
+            const requirements = {
+                length: password.length >= 7,
+                uppercase: /[A-Z]/.test(password),
+                specialOrNumber: /[0-9!@#$%^&*]/.test(password)
+            };
+            
+            if (!requirements.length) {
+                throw new Error('Password must be at least 7 characters long');
+            }
+            if (!requirements.uppercase) {
+                throw new Error('Password must contain at least one uppercase letter');
+            }
+            if (!requirements.specialOrNumber) {
+                throw new Error('Password must contain at least one number or special character');
+            }
+            return true;
+        }
+
         signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             console.log('Signup form submitted');
@@ -84,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Form data prepared:', formData);
 
             try {
+                validatePassword(formData.password);
                 console.log('Sending signup request...');
                 const response = await fetch('/api/auth/signup', {
                     method: 'POST',

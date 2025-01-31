@@ -2,6 +2,7 @@ from flask import session
 from datetime import datetime, timedelta
 from models import User, LogEntry, db
 from .data_manager import DataManager
+import bcrypt
 
 # user authentication and session management
 
@@ -15,14 +16,18 @@ class UserManager:
         email = DataManager.sanitize_email(email)
         user = User.query.filter_by(email=email).first()
         print(f"User found: {user}")
-        if user and user.check_password(password):
+        
+        if user and bcrypt.checkpw(
+            password.encode('utf-8'), 
+            user.password_hash.encode('utf-8')
+        ):
             print("Password check passed")
             return user
 
         print("Authentication failed")
         return None
 
-    # creates new users safely
+
     @staticmethod
     def create_user(email, password, developer_tag):
         email = DataManager.sanitize_email(email)
@@ -34,7 +39,8 @@ class UserManager:
             raise ValueError("Developer tag already taken")
         
         user = User(email=email, developer_tag=developer_tag)
-        user.set_password(password)
+        salt = bcrypt.gensalt()
+        user.password_hash = bcrypt.hashpw(password.encode('utf-8'), salt)
         db.session.add(user)
         return user
 

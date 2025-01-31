@@ -1,24 +1,18 @@
 import re
 from datetime import datetime
+import bcrypt
 
 class DataManager:
-    
-    
-    # <sanitize stuff start-------!>
-    
     @staticmethod
     def sanitize_repository_url(url):
-        #prevents xss 
         if not url:
             return None
         url = url.strip()
-        # url pattern check, no legit validator
-        url_pattern = r'^https?:\/\/(github\.com|gitlab\.com|bitbucket\.org)\/[\w\-\.\/]+$'
+        url_pattern = r'^https?:\/\/(github\.com|gitlab\.com|bitbucket\.org)\/[\w\-\.\/]+'
         if not re.match(url_pattern, url):
             raise ValueError("URL must be a valid repository URL")
         return url
 
-    # exception handling for bad times
     @staticmethod
     def validate_timestamps(start_time, end_time):
         try:
@@ -47,7 +41,7 @@ class DataManager:
     @staticmethod
     def sanitize_developer_tag(developer_tag):
         return developer_tag.strip().lower()
-    # sanitize and validate project name
+
     @staticmethod
     def sanitize_project(project):
         if not project or not isinstance(project, str):
@@ -58,14 +52,14 @@ class DataManager:
         if not re.match(r'^[a-zA-Z0-9][a-zA-Z0-9\s_-]*$', project):
             raise ValueError("Project name must start with alphanumeric and contain only letters, numbers, spaces, underscores, or hyphens")
         return project[:100]
-    # exception handling for bad content
+
     @staticmethod
     def sanitize_content(content):
         if not content or not isinstance(content, str):
             raise ValueError("Content cannot be empty")
         content = content.strip()
-        if len(content) > 10000:  # reasonable content limit
-            raise ValueError("Content exceeds maximum length of 1000 characters")
+        if len(content) > 10000:
+            raise ValueError("Content exceeds maximum length of 10000 characters")
         return content
 
     @staticmethod
@@ -83,5 +77,21 @@ class DataManager:
                 raise ValueError("Invalid date format")
         return clean_params
 
+@staticmethod
+def validate_password(password):
+    if len(password) < 7:
+        raise ValueError("Password must be at least 7 characters long")
+    if not any(c.isupper() for c in password):
+        raise ValueError("Password must contain at least one uppercase letter")
+    if not any(c.isdigit() or not c.isalnum() for c in password):
+        raise ValueError("Password must contain at least one number or special character")
+    return password.encode('utf-8')
 
-    #<sanitize stuff end ------!>
+    @staticmethod
+    def hash_password(password):
+        salt = bcrypt.gensalt()
+        return bcrypt.hashpw(DataManager.validate_password(password), salt)
+
+    @staticmethod
+    def verify_password(password, hashed):
+        return bcrypt.checkpw(DataManager.validate_password(password), hashed)
