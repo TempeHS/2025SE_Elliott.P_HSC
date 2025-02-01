@@ -2,7 +2,8 @@
 
 ### IF THE MAIL DOESNT WORK, PLEASE MESSAGE ME ON elliott.pezzutti@education.nsw.gov.au
 
-### I tried to change the commit messages, but the source control was being weird, so I just kept the changes in commit_message_change.txt will try to fix at school before due date
+> **Note:** For 2FA mail-related issues, contact elliott.pezzutti@education.nsw.gov.au
+
 
 ## Security Features
 - Bcrypt password hashing
@@ -14,16 +15,20 @@
 - Secure cookie handling
 - XSS protection
 
-## API Endpoints
+## Quick Links
+- [Security Features](#security-features)
+- [API Documentation](#api-documentation)
+- [Setup Guide](#setup-guide)
+- [Testing Guide](#testing-guide)
 
-### Authentication
+## API endpoints
 - POST /api/auth/signup     - Create new user
 - POST /api/auth/login      - Login existing user
 - POST /api/user/generate-key - Generate API key
 - POST /api/auth/enable-2fa - Enable 2FA
 - POST /api/auth/verify-2fa - Verify 2FA code
 
-### Entries
+## Entries
 - POST /api/entries         - Create new entry
 - GET  /api/entries        - Get all entries
 - GET  /api/entries/search - Search entries with filters
@@ -273,9 +278,10 @@ you will now be logged in with 2fa for a bit
 </details>
 
 ### logout
+```bash
 TOKEN=$(cat csrf_token.txt) &&
 curl -X POST http://localhost:5000/api/auth/logout -b cookies.txt -H "X-CSRF-TOKEN: $TOKEN"
-
+```
 ## entry stuff
 
 ###
