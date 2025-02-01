@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,51 +13,54 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     {% if not hide_nav %}
-    <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid">
-            <div class="logo-container">
-                <picture>
-                    <source srcset="{{ url_for('static', filename='images/icons/Android Icons/192x192.png') }}" media="(min-width: 192px)">
-                    <source srcset="{{ url_for('static', filename='images/icons/Android Icons/144x144.png') }}" media="(min-width: 144px)">
-                    <source srcset="{{ url_for('static', filename='images/icons/Android Icons/96x96.png') }}" media="(min-width: 96px)">
-                    <img src="{{ url_for('static', filename='images/icons/Android Icons/48x48.png') }}" class="navbar-logo" alt="DevLog Logo">
-                </picture>
-                <a class="navbar-brand" href="{{ url_for('index') }}">Home(r)_log_</a>
+    <header role="banner">
+        <nav class="navbar navbar-expand-lg" role="navigation" aria-label="Main navigation">
+            <div class="container-fluid">
+                <div class="logo-container">
+                    <picture>
+                        <source srcset="{{ url_for('static', filename='images/icons/Android Icons/192x192.png') }}" media="(min-width: 192px)">
+                        <source srcset="{{ url_for('static', filename='images/icons/Android Icons/144x144.png') }}" media="(min-width: 144px)">
+                        <source srcset="{{ url_for('static', filename='images/icons/Android Icons/96x96.png') }}" media="(min-width: 96px)">
+                        <img src="{{ url_for('static', filename='images/icons/Android Icons/48x48.png') }}" class="navbar-logo" alt="DevLog Logo">
+                    </picture>
+                    <a class="navbar-brand" href="{{ url_for('index') }}">Home(r)_log_</a>
+                </div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto" role="menubar">
+                        <li class="nav-item" role="none">
+                            <a class="nav-link" href="{{ url_for('home') }}" role="menuitem">home()</a>
+                        </li>
+                        <li class="nav-item" role="none">
+                            <a class="nav-link" href="{{ url_for('index') }}" role="menuitem">new_entry()</a>
+                        </li>
+                        <li class="nav-item" role="none">
+                            <a class="nav-link" href="{{ url_for('search') }}" role="menuitem">search()</a>
+                        </li>
+                        <li class="nav-item" role="none">
+                            <a class="nav-link" href="{{ url_for('privacy') }}" role="menuitem">privacy()</a>
+                        </li>
+                        <li class="nav-item" role="none">
+                            <a class="nav-link" href="{{ url_for('profile') }}" role="menuitem">profile()</a>
+                        </li>
+                    </ul>
+                    <div id="userInfo" class="navbar-text" aria-live="polite"></div>
+                </div>
             </div>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('home') }}">home()</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index') }}">new_entry()</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('search') }}">search()</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('privacy') }}">privacy()</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('profile') }}">profile()</a>
-                    </li>
-                </ul>
-                <div id="userInfo" class="navbar-text"></div>
-            </div>
-        </div>
-    </nav>
+        </nav>
+    </header>
     {% endif %}
 
     {% block message_box %}{% endblock %}
-    <main class="fade-in">
+    <main id="main-content" class="fade-in" role="main">
         {% block content %}{% endblock %}
     </main>
 

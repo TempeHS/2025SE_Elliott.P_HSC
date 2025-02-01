@@ -13,7 +13,9 @@
                             class="profile-image rounded-circle mb-3">
                         <h5 class="card-title">{{ current_user.developer_tag }}</h5>
                         <p class="card-text">{{ current_user.email }}</p>
-                        <button id="logoutBtn" class="btn btn-logout">logout</button>
+                        <button id="logoutBtn" class="btn btn-logout" aria-label="Log out of account">
+                            logout
+                        </button>
                     </div>
                 </div>
 
@@ -60,7 +62,9 @@ curl -X POST http://your-api/api/entries \
                                     </div>
                                     <!-- API documentation -->
                                 {% else %}
-                                    <button class="btn btn-primary" id="generateApiKey">Enable API Access</button>
+                                <button class="btn btn-primary" id="generateApiKey" aria-label="Generate new API key">
+                                    Enable API Access
+                                </button>
                                 {% endif %}
                             </div>
                         </div>

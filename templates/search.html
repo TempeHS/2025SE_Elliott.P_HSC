@@ -4,29 +4,42 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-12">
-            <div class="card">
+            <section class="card" aria-labelledby="search-heading">
                 <div class="card-body">
-                    <form id="searchForm">
+                    <h2 id="search-heading" class="card-title">Search Entries</h2>
+                    <form id="searchForm" role="search">
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <input type="text" class="form-control" id="projectSearch" list="projectList" placeholder="Search by project name">
+                                <label for="projectSearch" class="visually-hidden">Project name</label>
+                                <input type="text" class="form-control" id="projectSearch" 
+                                       list="projectList" placeholder="Search by project name"
+                                       aria-label="Search by project name">
                                 <datalist id="projectList"></datalist>
                             </div>
                             <div class="col-md-4">
-                                <input type="text" class="form-control" id="developerSearch" list="developerList" placeholder="Search by developer">
-                                <datalist id="developerList"></datalist>                                                                
+                                <label for="developerSearch" class="visually-hidden">Developer</label>
+                                <input type="text" class="form-control" id="developerSearch" 
+                                       list="developerList" placeholder="Search by developer"
+                                       aria-label="Search by developer">
+                                <datalist id="developerList"></datalist>
                             </div>
                             <div class="col-md-4">
-                                <input type="date" class="form-control" id="dateSearch">
+                                <label for="dateSearch" class="visually-hidden">Date</label>
+                                <input type="date" class="form-control" id="dateSearch"
+                                       aria-label="Search by date">
                             </div>
                             <div class="col-md-4">
-                                <select class="form-control sort-controls" id="sortField">
+                                <label for="sortField" class="visually-hidden">Sort by</label>
+                                <select class="form-control sort-controls" id="sortField"
+                                        aria-label="Sort field">
                                     <option value="date">Sort by Date</option>
                                     <option value="project">Sort by Project</option>
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <select class="form-control sort-controls" id="sortOrder">
+                                <label for="sortOrder" class="visually-hidden">Sort order</label>
+                                <select class="form-control sort-controls" id="sortOrder"
+                                        aria-label="Sort order">
                                     <option value="desc">Descending</option>
                                     <option value="asc">Ascending</option>
                                 </select>
@@ -39,24 +52,18 @@
                         </div>
                     </form>
                 </div>
-            </div>
+            </section>
         </div>
     </div>
 
     <div class="row mt-4">
         <div class="col-12">
-            <div id="searchResults" class="search-results-container">
-                <!-- Results will be dynamically inserted here -->
-            </div>
+            <section aria-label="Search Results">
+                <div id="searchResults" class="search-results-container" aria-live="polite">
+                    <!-- Results will be dynamically inserted here -->
+                </div>
+            </section>
         </div>
-    </div>
-</div>
-{% endblock %}
-
-{% block message_box %}
-<div class="container mt-4">
-    <div class="message-box">
-        <p class="mono-text">search_entries :: find_your_logs</p>
     </div>
 </div>
 {% endblock %}

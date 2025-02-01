@@ -9,6 +9,40 @@
     --muted: rgba(255, 255, 255, 0.8);
     --border: rgba(182, 182, 182, 0.527);
     --gradient: linear-gradient(45deg, #ff8c00, #ffa500);
+    --focus-outline: 2px solid var(--yellow);
+}
+
+/* Accessibility Enhancements */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--yellow);
+    color: var(--dark);
+    padding: 8px;
+    z-index: 100;
+    transition: top 0.2s;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* Focus States */
+:focus {
+    outline: var(--focus-outline);
+    outline-offset: 2px;
 }
 
 /* base */
@@ -67,12 +101,17 @@ h1, h2, h3, h4, h5, h6,
 .form-control {
     background-color: var(--darker);
     border: 1px solid var(--border);
-    color: var(--white);
+    color: var(--white) !important;
     border-radius: 0.5rem;
+}
+
+.form-control::placeholder {
+    color: var(--muted);
 }
 
 .form-control:focus {
     background-color: var(--card);
+    color: var(--white) !important;
     border-color: var(--orange);
     box-shadow: 0 0 0 0.2rem rgba(255, 140, 0, 0.25);
 }
@@ -83,7 +122,17 @@ h1, h2, h3, h4, h5, h6,
 
 /* buttons */
 .btn {
+    position: relative;
     border-radius: 0.5rem;
+}
+
+.btn:focus {
+    outline: var(--focus-outline);
+    outline-offset: 2px;
+}
+
+.btn:active {
+    transform: translateY(1px);
 }
 
 .btn-primary {
