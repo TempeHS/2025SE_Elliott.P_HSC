@@ -18,7 +18,8 @@ app.config['SECRET_KEY'] = os.urandom(24)
 app.config.from_object(Config)
 
 # initialize mail
-mail = Mail(app)
+mail = Mail()
+mail.init_app(app)
 
 # initialize CSRF protection
 csrf = CSRFProtect()

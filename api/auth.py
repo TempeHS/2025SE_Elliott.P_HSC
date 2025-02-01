@@ -1,20 +1,19 @@
-from flask import jsonify, request, session
+from flask import jsonify, request, session, current_app
 from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime
 from models import db, User
 from . import api
 from .data_manager import DataManager
 from .user_manager import UserManager
+from flask_mail import Message
 import random
 import string
-from flask_mail import Mail, Message
 import logging
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-#when get POST request, check credentials and handle errors
 @api.route('/auth/login', methods=['POST'])
 def login():
     logger.info("Login attempt received")
@@ -38,10 +37,10 @@ def login():
                 session['verification_code'] = code
                 
                 msg = Message('Login Verification Code',
-                              sender='noreply@devlog.com',
-                              recipients=[user.email])
+                            sender='noreply@devlog.com',
+                            recipients=[user.email])
                 msg.body = f'Your verification code is: {code}'
-                mail.send(msg)
+                current_app.extensions['mail'].send(msg)
                 
                 logger.info(f"2FA code sent to user: {user.email}")
                 return jsonify({
@@ -65,8 +64,6 @@ def login():
 def generate_verification_code():
     return ''.join(random.choices(string.digits, k=6))
 
-
-#when get POST request, validate data and create new user
 @api.route('/auth/signup', methods=['POST'])
 def signup():
     print("Signup attempt received")
@@ -96,7 +93,6 @@ def signup():
         print(f"Signup error: {str(e)}")
         return jsonify({'error': str(e)}), 400
 
-#havent implemented yet !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 @api.route('/auth/logout', methods=['POST'])
 def logout():
     try:
@@ -105,28 +101,6 @@ def logout():
         return jsonify({'message': 'Logged out successfully', 'redirect': '/login'})
     except Exception as e:
         return jsonify({'error': str(e)}), 400
-
-@api.route('/user/data', methods=['GET'])
-def get_user_data():
-    user = UserManager.get_current_user()
-    if not user:
-        return jsonify({'error': 'Authentication required'}), 401
-        
-    user_data = UserManager.download_user_data(user)
-    return jsonify(user_data)
-
-@api.route('/user/data', methods=['DELETE'])
-def delete_user_data():
-    user = UserManager.get_current_user()
-    if not user:
-        return jsonify({'error': 'Authentication required'}), 401
-        
-    UserManager.delete_user_account(user)
-    return jsonify({'message': 'Account deleted successfully'})
-
-
-def generate_verification_code():
-    return ''.join(random.choices(string.digits, k=6))
 
 @api.route('/auth/enable-2fa', methods=['POST'])
 def enable_2fa():
@@ -141,7 +115,7 @@ def enable_2fa():
                   sender='noreply@devlog.com',
                   recipients=[user.email])
     msg.body = f'Your verification code is: {code}'
-    mail.send(msg)
+    current_app.extensions['mail'].send(msg)
     
     return jsonify({'message': 'Verification code sent'})
 
@@ -186,8 +160,6 @@ def verify_login():
             session.pop('temp_user_id', None)
             return jsonify({'redirect': '/'})
     return jsonify({'error': 'Invalid verification code'}), 401
-
-# API endpoint auth!
 
 @api.route('/user/generate-key', methods=['POST'])
 @login_required
