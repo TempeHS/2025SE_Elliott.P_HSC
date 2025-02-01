@@ -16,6 +16,10 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
 app.config.from_object(Config)
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = False  # Set to True in production
+app.config['SESSION_TYPE'] = 'filesystem'
+
 
 # initialize mail
 mail = Mail()

@@ -9,6 +9,7 @@ from flask_mail import Message
 import random
 import string
 import logging
+import time
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)
@@ -19,12 +20,10 @@ def login():
     logger.info("Login attempt received")
     
     if not request.is_json:
-        logger.warning("Invalid content type in login request")
         return jsonify({'error': 'Invalid content type'}), 400
         
     data = request.get_json()
     if not all(k in data for k in ['email', 'password']):
-        logger.warning("Missing credentials in login request")
         return jsonify({'error': 'Missing credentials'}), 400
 
     try:
@@ -35,6 +34,7 @@ def login():
                 code = generate_verification_code()
                 session['temp_user_id'] = user.id
                 session['verification_code'] = code
+                session['verification_expires'] = time.time() + 300  # 5 minute timeout
                 
                 msg = Message('Login Verification Code',
                             sender='noreply@devlog.com',
@@ -45,16 +45,15 @@ def login():
                 logger.info(f"2FA code sent to user: {user.email}")
                 return jsonify({
                     'require_2fa': True,
-                    'message': 'Please enter verification code'
+                    'message': 'Please enter verification code',
+                    'expires_in': 300
                 })
                 
             login_user(user)
             session['user_id'] = user.id
             session['last_active'] = datetime.utcnow().isoformat()
-            logger.info(f"User logged in successfully: {user.email}")
             return jsonify({'redirect': '/'})
             
-        logger.warning(f"Failed login attempt for email: {data['email']}")
         return jsonify({'error': 'Invalid credentials'}), 401
         
     except Exception as e:
@@ -148,17 +147,34 @@ def verify_2fa():
 
 @api.route('/auth/verify-login', methods=['POST'])
 def verify_login():
+    logger.info("Verification attempt received")
+    
     code = request.json.get('code')
-    if code == session.get('verification_code'):
-        user_id = session.get('temp_user_id')
-        user = User.query.get(user_id)
+    stored_code = session.get('verification_code')
+    temp_user_id = session.get('temp_user_id')
+    
+    logger.info(f"Received verification code: {code}")
+    logger.info(f"Stored verification code: {stored_code}")
+    logger.info(f"Temporary user ID: {temp_user_id}")
+    logger.info(f"Current session data: {dict(session)}")
+
+    if code == stored_code and temp_user_id:
+        user = User.query.get(temp_user_id)
         if user:
             login_user(user)
             session['user_id'] = user.id
             session['last_active'] = datetime.utcnow().isoformat()
+            
             session.pop('verification_code', None)
             session.pop('temp_user_id', None)
+            
+            logger.info(f"User {user.email} successfully verified and logged in")
             return jsonify({'redirect': '/'})
+            
+        logger.warning("User not found for temp_user_id")
+    else:
+        logger.warning("Code mismatch or missing temp_user_id")
+        
     return jsonify({'error': 'Invalid verification code'}), 401
 
 @api.route('/user/generate-key', methods=['POST'])
