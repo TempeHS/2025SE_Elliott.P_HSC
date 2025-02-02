@@ -70,7 +70,7 @@ export class LogEntry {
     async createEntry() {
         const formData = {
             project: document.getElementById('project').value,
-            content: document.getElementById('content').value,
+            content: document.getElementById('content').value || 'No content provided',
             repository_url: document.getElementById('repository_url').value,
             start_time: document.getElementById('start_time').value,
             end_time: document.getElementById('end_time').value

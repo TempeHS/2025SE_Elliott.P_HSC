@@ -28,7 +28,11 @@ def create_entry():
 
     try:
         data = request.get_json()
+        required_fields = ['project', 'content', 'repository_url', 'start_time', 'end_time']
+        missing_fields = [field for field in required_fields if field not in data]
         print("received data:", data)
+        if missing_fields:
+            return jsonify({'error': f"Missing fields: {', '.join(missing_fields)}"}), 400
 
         # validate timestamps first
         start_time, end_time = DataManager.validate_timestamps(

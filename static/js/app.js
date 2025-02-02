@@ -20,6 +20,7 @@ class EntryManager {
         const isValid = input.checkValidity();
         input.classList.toggle('is-valid', isValid);
         input.classList.toggle('is-invalid', !isValid);
+        return isValid;
     }
 
     async handleSubmit(e) {
@@ -31,6 +32,8 @@ class EntryManager {
             start_time: this.form.querySelector('#start_time').value,
             end_time: this.form.querySelector('#end_time').value
         };
+
+        console.log("Submitting form data:", formData); // Add this to verify data
 
         try {
             const response = await fetch('/api/entries', {

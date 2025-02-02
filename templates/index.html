@@ -6,19 +6,28 @@
 <div class="container mt-4">
     <form id="entryForm">
         <div class="form-group mb-3">
-            <label for="project" class="form-label" id="project-label">project</label>
+            <label for="project" class="form-label">project</label>
             <input type="text" 
-                class="form-control" 
-                id="project" 
-                aria-labelledby="project-label"
-                list="projectList" 
-                autocomplete="off"
-                placeholder="Select or type project name"
-                required>
+                   class="form-control" 
+                   id="project" 
+                   list="projectList" 
+                   autocomplete="off"
+                   placeholder="Select or type project name"
+                   required>
             <datalist id="projectList"></datalist>
         </div>
         <div class="form-group mb-3">
-            <label for="repository_url" class="form-label" id="repository-url">repository url</label>
+            <label for="content" class="form-label">content</label>
+            <textarea class="form-control" 
+                      id="content" 
+                      name="content"
+                      rows="3" 
+                      required
+                      minlength="1"
+                      placeholder="Enter log content"></textarea>
+        </div>
+        <div class="form-group mb-3">
+            <label for="repository_url" class="form-label">repository url</label>
             <input type="url" 
                    class="form-control" 
                    id="repository_url" 
@@ -28,7 +37,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group mb-3">
-                    <label for="start_time" class="form-label"id="start-time">start time</label>
+                    <label for="start_time" class="form-label">start time</label>
                     <input type="datetime-local" 
                            class="form-control" 
                            id="start_time" 
@@ -37,20 +46,13 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group mb-3">
-                    <label for="end_time" class="form-label"id="end-time">end time</label>
+                    <label for="end_time" class="form-label">end time</label>
                     <input type="datetime-local" 
                            class="form-control" 
                            id="end_time" 
                            required>
                 </div>
             </div>
-        </div>
-        <div class="form-group mb-3">
-            <label for="content" class="form-label"id="content">content</label>
-            <textarea class="form-control" 
-                      id="content" 
-                      rows="3" 
-                      required></textarea>
         </div>
         <button type="submit" class="btn btn-primary mt-3">create Entry</button>
     </form>
